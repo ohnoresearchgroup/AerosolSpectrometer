@@ -21,7 +21,7 @@ class Monochromator():
         ser = serial.Serial()
         
         #port on computer
-        ser.port = 'COM1'
+        ser.port = '/dev/tty.usbserial'
         
         #serial settings
         ser.bytesize = serial.EIGHTBITS
@@ -30,39 +30,77 @@ class Monochromator():
         ser.parity = serial.PARITY_NONE
         ser.xonxoff = False
            
-        #timeout after 0.3 second so don't wait forever
+        #timeout
         ser.timeout = 0.3
         
         #open serial port
         ser.open()
-        
+
+        #store serial port        
         self.ser = ser
     
     #execute 'ECHO' to check that monochromator is connected
     def echo(self):
-        self.ser.write(str(27).encode())
+        try:
+            self.ser.write(b'\x1B')
         
-        #wait for 30 ms to give it time to recover
-        time.sleep(0.03)
+            string = self.ser.readline()
+            if string == b'\x1B':
+                print('Monochromator connected.')
+            else:
+                print('Monochromator not communicating.')
+        except serial.SerialException:
+            print('Serial not connected.')
+    
+
+    #executes a query for position
+    def queryPosition(self):
+        self.ser.write(b'\x38\x00')
         
-        #get response and extract float
-        string = self.ser.readline()
-        print(string)
-     
-    #executes a query depending on the byte that you give it  
-    def query(self,querybyte):
-        print(querybyte)
+        statusMessage = self.ser.readline()
+        statusByte = self.ser.readline()
+        
+        #split status Message into two bytes
+        byte1 = statusMessage[0]
+        byte2 = statusMessage[1]
+        
+        pos = self.convertFromBytes(byte1,byte2) 
+        return pos
     
     
+    def queryUnits(self):
+        self.ser.write(b'\x38\x0E')
+        
+        statusMessage = self.ser.readline()
+        statusByte = self.ser.readline()
+        
+        print(statusMessage) 
         
     #returns the grating to home position    
     def reset(self):
-        self.ser.write(str(255).encode(),str(255).encode(),str(255).encode())
+        self.ser.write(b'\xFF\xFF\xFF')
+        
+    #goto
+    def goTo(self,position):
+        (posByte1,posByte2) = self.convertToBytes(position)
+        
+        self.ser.write(b'\x10',posByte1.encode(),posByte2.encode())
+        
+        statusByte = self.ser.readline()
+        done = self.ser.readline()
      
     #scans the monochromator between start and stop, at speed set by speed 
     def scan(self, start, stop):
+        
         (startByte1,startByte2) = self.convertToBytes(start)
         (stopByte1,stopByte2) = self.convertToBytes(stop)
+        
+        self.ser.write(b'\x0C',startByte1.encode(),startByte2.encode(),
+                       stopByte1.encode(),stopByte2.encode())
+        
+        #figure out how to access CTS
+        
+        
         
     #sets the size that the step steps by
     def size(self,size):
@@ -76,7 +114,7 @@ class Monochromator():
         
     #moves the monochromator by the step size
     def step(self):
-        self.ser.write(str(54).encode())
+        self.ser.write(b'\x36')
     
     #sets the units used in the goto, scan, size, calibrate
     def units(self,unit):
@@ -91,7 +129,7 @@ class Monochromator():
         else:
             print('not a valid unit')
         if byte:
-            self.ser.write(str(50).encode(),byte)
+            self.ser.write(b'\x32',byte)
     
     #convert number into bytes the monochromator understands (from SP manual)    
     def convertToBytes(self,number):
