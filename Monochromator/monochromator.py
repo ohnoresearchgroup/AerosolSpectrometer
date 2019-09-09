@@ -11,8 +11,6 @@ Created on Wed Sep  4 15:13:12 2019
 #serial communications
 import serial
 
-import time
-
 class Monochromator():
 
     def __init__(self):
@@ -31,121 +29,134 @@ class Monochromator():
         ser.xonxoff = False
            
         #timeout
-        ser.timeout = 0.3
+        ser.timeout = 8
         
         #open serial port
         ser.open()
 
         #store serial port        
         self.ser = ser
-    
-    #execute 'ECHO' to check that monochromator is connected
-    def echo(self):
-        try:
-            self.ser.write(b'\x1B')
-        
-            string = self.ser.readline()
-            if string == b'\x1B':
-                print('Monochromator connected.')
-            else:
-                print('Monochromator not communicating.')
-        except serial.SerialException:
-            print('Serial not connected.')
-    
-
-    #executes a query for position
-    def queryPosition(self):
-        self.ser.write(b'\x38\x00')
-        
-        statusMessage = self.ser.readline()
-        statusByte = self.ser.readline()
-        
-        #split status Message into two bytes
-        byte1 = statusMessage[0]
-        byte2 = statusMessage[1]
-        
-        pos = self.convertFromBytes(byte1,byte2) 
-        return pos
-    
-    
-    def queryUnits(self):
-        self.ser.write(b'\x38\x0E')
-        
-        statusMessage = self.ser.readline()
-        statusByte = self.ser.readline()
-        
-        print(statusMessage) 
-        
-    #returns the grating to home position    
-    def reset(self):
-        self.ser.write(b'\xFF\xFF\xFF')
-        
+                        
     #goto
     def goTo(self,position):
+        self.ser.reset_input_buffer()
+        
         (posByte1,posByte2) = self.convertToBytes(position)
         
-        self.ser.write(b'\x10',posByte1.encode(),posByte2.encode())
+        #start with empty byte array, build up command
+        cmd = bytearray()
+        cmd.append(0x10)
+        cmd.append(posByte1)
+        cmd.append(posByte2)
         
-        statusByte = self.ser.readline()
-        done = self.ser.readline()
-     
-    #scans the monochromator between start and stop, at speed set by speed 
-    def scan(self, start, stop):
+        self.ser.write(cmd)
         
-        (startByte1,startByte2) = self.convertToBytes(start)
-        (stopByte1,stopByte2) = self.convertToBytes(stop)
+        #get reply by waiting for last byte expected
+        reply = self.ser.read_until(b'\x18',None)
+        statusByte = reply[0:1]
+        if (int.from_bytes(statusByte,byteorder='big') >= 128):
+            print('Command not excepted.')
+
+            
+    #executes a query for position
+    def queryPosition(self):
+        self.ser.reset_input_buffer()
         
-        self.ser.write(b'\x0C',startByte1.encode(),startByte2.encode(),
-                       stopByte1.encode(),stopByte2.encode())
+        #start with empty byte array, build up command
+        cmd = bytearray()
+        cmd.append(0x38)
+        cmd.append(0x00)        
+        self.ser.write(cmd)
         
-        #figure out how to access CTS
+        #get reply by waiting for last byte expected
+        reply = self.ser.read_until(b'\x18',None)
+        posByte1 = reply[0:1]
+        posByte2 = reply[1:2]
         
-        
-        
-    #sets the size that the step steps by
-    def size(self,size):
-        print(size)
-        
-        
-    #sets the speed that the monochromator scans at    
-    def speed(self,speed):
-        #speeds for 1200 G/mm: 1000,500,250,125,62,31,15,7,3,1 in A/s
-        (speedByte1,speedByte2) = self.convertToBytes(speed)
-        
-    #moves the monochromator by the step size
-    def step(self):
-        self.ser.write(b'\x36')
-    
-    #sets the units used in the goto, scan, size, calibrate
-    def units(self,unit):
+        pos = self.convertFromBytes(posByte1,posByte2)
+        return pos       
+
+            
+    #set the units to 'microns','nanometers',or 'angstroms'      
+    def setUnits(self,units):
+        self.ser.reset_input_buffer()
         
         byte = None
-        if unit == 'microns':
-            byte = b'00'
-        elif unit == 'nanometers':
-            byte = b'01'
-        elif unit == 'angstroms':
-            byte = b'02'
+        if units == 'microns':
+            byte = 0x00
+        elif units == 'nanometers':
+            byte = 0x01
+        elif units == 'angstroms':
+            byte = 0x02
+        
+        if byte is not None:
+            #start with empty byte array, build up command
+            cmd = bytearray()
+            cmd.append(0x32)
+            cmd.append(byte)
+            self.ser.write(cmd)
         else:
-            print('not a valid unit')
-        if byte:
-            self.ser.write(b'\x32',byte)
+            print('Incorrect units. Units can be microns, nanometers, or angstroms')
     
+    #ask what units it is using, prints to console
+    def queryUnits(self):
+        self.ser.reset_input_buffer()
+        
+        #start with empty byte array, build up command
+        cmd = bytearray()
+        cmd.append(0x38)
+        cmd.append(0x0E)
+        self.ser.write(cmd)
+        
+        #get reply by waiting for last byte expected
+        reply = self.ser.read_until(b'\x18',None)
+        unitsByte = reply[1:2]
+        if unitsByte == b'\x00':
+            print('Units are microns')
+        elif unitsByte == b'\x01':
+            print('Units are nanometers.')
+        elif unitsByte == b'\x02':
+            print('Units are Angstroms.')
+        
     #convert number into bytes the monochromator understands (from SP manual)    
     def convertToBytes(self,number):
         num1 = int(number/256)
         num2 = int(number - 256*num1)
         
-        byte1 = str(num1).encode()
-        byte2 = str(num2).encode()
-        
-        return(byte1,byte2)
+        return(num1,num2)
         
     #convert from bytes into number, according to SP manual    
     def convertFromBytes(self,byte1,byte2):
-        number = int(byte1)*256 + int(byte2)
+        number = (int.from_bytes(byte1,byteorder='big')*256 + 
+                  int.from_bytes(byte2,byteorder='big'))
         print(number)
+              
+    #execute 'ECHO' to check that monochromator is connected
+    def echo(self):
+        try:
+            self.ser.reset_input_buffer()
+            
+            #start with empty byte array, build up command
+            cmd = bytearray()
+            cmd.append(0x1B)
+            
+            #write command to serial port
+            self.ser.write(cmd)
+            
+            #get reply by waiting for last byte expected
+            reply = self.ser.read_until(b'\x1B',None)
+            if reply == b'\x1B':
+                print('Monochromator connected.')
+            else:
+                print('Monochromator not communicating.')
+        except serial.SerialException:
+            print('Serial not connected.')
+            
         
+    #returns the grating to home position    
+    def reset(self):        
+        self.ser.write(b'\xFF\xFF\xFF')    
+         
     #close serial port
-    def close(self):
+    def close(self):       
         self.ser.close()
