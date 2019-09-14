@@ -24,7 +24,7 @@ class Propeller():
         ser.baudrate = 115200
 
         #timeout so don't wait forever
-        ser.timeout = 0.05
+        ser.timeout = 1
 
         #open serial port
         ser.open()
@@ -42,10 +42,10 @@ class Propeller():
         self.ser.write(b'D\r\n')
         
         #wait 1 second
-        time.sleep(1.001)
+        time.sleep(1.005)
         
-        #get result
-        print(self.ser.readline().decode())
+        #get result (should be 4 bytes)
+        return self.ser.read(4).decode()
 
         
     def checkStatus(self):

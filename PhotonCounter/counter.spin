@@ -33,7 +33,7 @@ PUB main | data
             
             elseif cmd == "D"               'command to get data           
                 cognew(@entry, @data)       'start cog to count for 1 s
-                waitcnt(cnt + clkfreq + 32) 'wait 1 s + 32 extra cycles   
+                waitcnt(cnt + clkfreq + 8000) 'wait 1 s + 8000 extra cycles  (1.0001 s) 
                 serial.dec(data)            'send data
                                   
 'assembly code for running counter
