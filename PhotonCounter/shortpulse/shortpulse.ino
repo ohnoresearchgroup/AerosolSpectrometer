@@ -7,5 +7,4 @@ void loop ()
 {
   PIND = 4 ;  // toggle pin 2 with 1 instruction
   PIND = 4 ;  // toggle pin 2 with 1 instruction
-  delayMicroseconds (5000) ;
 }

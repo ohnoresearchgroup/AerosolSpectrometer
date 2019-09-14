@@ -27,7 +27,9 @@ class Propeller():
         ser.timeout = 1
 
         #open serial port
-        ser.open()
+        ser.open()        
+        ser.reset_input_buffer()
+        ser.reset_output_buffer()
         
         #save serial port 
         self.ser = ser
@@ -39,28 +41,28 @@ class Propeller():
         self.ser.reset_output_buffer()
         
         #send command to get data
-        self.ser.write(b'D\r\n')
+        self.ser.write(b'D')
         
-        #wait 1 second
-        time.sleep(1.005)
+        #wait just over 1 second
+        time.sleep(1.01)
         
-        #get result (should be 4 bytes)
-        return self.ser.read(4).decode()
+        #get result (should be 8 bytes, in hex), turn to int
+        result = int(self.ser.read(8).decode(),16)
+        return result
 
-        
     def checkStatus(self):
         #flush buffers
         self.ser.reset_input_buffer()
         self.ser.reset_output_buffer()
         
         #send command to check status
-        self.ser.write(b'C\r\n')
+        self.ser.write(b'C')
         
         #wait briefly
         time.sleep(0.001)
         
         #get status character, check if it is G
-        char = self.ser.readline().decode()
+        char = self.ser.read(1).decode()
         if char == 'G':
             print("Counter connected.")
         else:

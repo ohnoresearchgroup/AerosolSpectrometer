@@ -1,4 +1,12 @@
-''Using the Propeller to count pulses
+''Using the Propeller to count pulses. 
+''The first section (CON) defines the crystal frequency. 80_000_000 means 12.5 ns per clock cycle
+''The second section defines the pins for the serial communications, while the third imports the serial 'library'
+''The forth section defines two variables, one will hold the bytes that are read and the other will store the data to send
+''The main method intitializes the serial communications, then enters a loop repeatedly checking to see if it go a message
+''If it got the check status command ('C'), it replies 'G' that it is good
+''If it gets the data command, it starts a cog to count pulses on PIN 7 for 1 second, then sends that data out in hex format
+''If it doesn't get anything in 100 ms, it just loops back around
+
 CON 
         'Run at 80_000_000 MHz
         _clkmode = xtal1 + pll16x
@@ -16,9 +24,10 @@ OBJ
         
 VAR
         byte cmd 'byte to store serial command
+        long data
 
 'main method to execute
-PUB main | data
+PUB main
         
         'initialize serial comms
         serial.start(rx_pin, tx_pin, mode, baud) 
@@ -34,7 +43,8 @@ PUB main | data
             elseif cmd == "D"               'command to get data           
                 cognew(@entry, @data)       'start cog to count for 1 s
                 waitcnt(cnt + clkfreq + 8000) 'wait 1 s + 8000 extra cycles  (1.0001 s) 
-                serial.dec(data)            'send data
+                serial.hex(data,8)            'send data in hex form, 8 digits (4 pairs of hex)
+            'if its not either, loop
                                   
 'assembly code for running counter
 DAT
