@@ -10,7 +10,7 @@ Created on Mon Jul  8 22:02:00 2019
 #import numpy as np
 #from datetime import datetime
 
-n = 100
+n = 3
 
 a = np.zeros(n)
 

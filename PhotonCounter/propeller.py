@@ -14,7 +14,7 @@ class Propeller():
     def __init__(self):      
         #initialize the serial port
         ser = serial.Serial()
-        ser.port = "/dev/cu.usbserial-QS5KAR5"
+        ser.port = "COM4"
 
         #serial settings
         ser.bytesize = serial.EIGHTBITS

@@ -19,7 +19,7 @@ class Monochromator():
         ser = serial.Serial()
         
         #port on computer
-        ser.port = '/dev/tty.usbserial'
+        ser.port = 'COM5'
         
         #serial settings
         ser.bytesize = serial.EIGHTBITS
@@ -29,7 +29,7 @@ class Monochromator():
         ser.xonxoff = False
            
         #timeout
-        ser.timeout = 8
+        ser.timeout = 1;
         
         #open serial port
         ser.open()
