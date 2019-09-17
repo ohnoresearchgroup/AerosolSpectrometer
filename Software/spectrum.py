@@ -8,14 +8,69 @@ Created on Mon Sep 16 17:22:45 2019
 
 import numpy as np
 from datetime import datetime
+import os
 
 class Spectrum():
        
-    def __init__(self,name,start,stop,step,time):
+    def __init__(self,m,pc,name,start,stop,step,duration):       
+        self.m = m
+        self.pc = pc
+        
         self.name = name
-        self.time = datetime.now()
-        self.range = (start,stop,step)
-        self.duration = time
+        self.time = datetime.now().strftime('%Y%m%d_%H%M%S')
+        self.start = start
+        self.stop = stop
+        self.step = step
+        self.duration = duration
         
         self.wavelengths = np.arange(start,stop+step,step)
-        self.counts = np.zeros(len(self.wavelengths))
+        self.counts = []
+        self.aves = []
+        
+        os.mkdir(self.time)
+        
+        self.createDetailsFile()
+        self.runScan()
+        
+    def createDetailsFile(self):  
+        f_details  = open(self.time+ '/' + self.time +'_details.txt','w')
+        f_details.write('name\t' + self.name + '\r\n')
+        f_details.write('time\t' + self.time + '\r\n')
+        f_details.write('start\t' + str(self.start) + ' nm\r\n')
+        f_details.write('stop\t' + str(self.stop) + ' nm\r\n')
+        f_details.write('step\t' + str(self.step) + ' nm\r\n')
+        f_details.write('duration\t' + str(self.duration) + ' s\r\n')
+        f_details.close()
+    
+    def runScan(self):
+        f_ave = open(self.time + '/' + self.time + '_ave.txt','w+')
+        f_data = open(self.time + '/' + self.time + '_data.txt','w+')
+        
+        
+        for wl in self.wavelengths:
+            #go to wavelength
+            self.m.goTo(wl)
+            
+            #write wavelength to file
+            f_ave.write(str(wl))
+            f_data.write(str(wl))
+            
+            #initialize array to hold data
+            data = np.zeros(self.duration,dtype=np.int8)
+            
+            #for each second, get the data
+            for (index,value) in enumerate(data):
+                data[index] = self.pc.getData()
+                
+            #add the array of data to counts, write to file          
+            self.counts.append(data)            
+            string = np.array2string(data,separator='\t')[1:][:-1]
+            f_data.write('\t' + string + '\r\n')
+            
+            #add the mean to aves, write to file
+            ave = np.mean(data)
+            self.aves.append(ave)
+            f_ave.write('\t' + str(ave) + '\r\n')
+            
+        
+            

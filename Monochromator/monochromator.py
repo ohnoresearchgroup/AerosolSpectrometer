@@ -13,13 +13,13 @@ import serial
 
 class Monochromator():
 
-    def __init__(self):
+    def __init__(self,port):
         
         #initialize serial port
         ser = serial.Serial()
         
         #port on computer
-        ser.port = 'COM5'
+        ser.port = port
         
         #serial settings
         ser.bytesize = serial.EIGHTBITS
@@ -36,6 +36,9 @@ class Monochromator():
 
         #store serial port        
         self.ser = ser
+        
+        #check status
+        self.checkStatus()
                         
     #goto
     def goTo(self,position):
@@ -132,7 +135,7 @@ class Monochromator():
         print(number)
               
     #execute 'ECHO' to check that monochromator is connected
-    def echo(self):
+    def checkStatus(self):
         try:
             self.ser.reset_input_buffer()
             

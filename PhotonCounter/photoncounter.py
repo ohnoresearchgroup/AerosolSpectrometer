@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+#parallax propeller for photon counting
 # -*- coding: utf-8 -*-
 """
 Created on Mon Jul  8 21:36:51 2019
@@ -9,12 +10,12 @@ Created on Mon Jul  8 21:36:51 2019
 import serial
 import time
 
-class Propeller():
+class PhotonCounter():
        
-    def __init__(self):      
+    def __init__(self,port):      
         #initialize the serial port
         ser = serial.Serial()
-        ser.port = "COM4"
+        ser.port = port
 
         #serial settings
         ser.bytesize = serial.EIGHTBITS
@@ -33,6 +34,9 @@ class Propeller():
         
         #save serial port 
         self.ser = ser
+        
+        #check status
+        self.checkStatus()
 
 
     def getData(self):
