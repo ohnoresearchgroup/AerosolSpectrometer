@@ -5,7 +5,7 @@ Created on Mon Sep 16 17:22:45 2019
 
 @author: pohno
 """
-
+import matplotlib.pyplot as plt
 import numpy as np
 from datetime import datetime
 import os
@@ -26,7 +26,8 @@ class Spectrum():
         
         self.wavelengths = np.arange(start,stop+step,step)
         self.counts = []
-        self.aves = []
+        self.aves = np.zeros(len(self.wavelengths))
+        self.aves[:] = np.nan
           
         self.dirpath = self.path + '\\' + self.time
         os.mkdir(self.dirpath)
@@ -48,8 +49,12 @@ class Spectrum():
         f_ave = open(self.dirpath + '\\' + self.time + '_ave.txt','w+')
         f_data = open(self.dirpath + '\\' + self.time + '_data.txt','w+')
         
+        #create figure, store it
+        self.fig = plt.figure()
+        ax = self.fig.add_subplot(1,1,1)
+        ax.plot(self.wavelengths, self.aves, 'r-')
         
-        for wl in self.wavelengths:
+        for (i,wl) in enumerate(self.wavelengths):
             #go to wavelength
             self.m.goTo(wl)
             print('Moved to ' + str(wl) + ' nm.')
@@ -72,10 +77,16 @@ class Spectrum():
             
             #add the mean to aves, write to file
             ave = np.mean(data)
-            self.aves.append(ave)
+            self.aves[i] = ave
             f_ave.write('\t' + str(ave) + '\n')
             print('Ave = ' + str(ave) + ' c.p.s.')
             
+            #clear the previous lines, replot the updated line
+            ax.clear()
+            ax.plot(self.wavelengths, self.aves, 'r-')
+            self.fig.canvas.draw()
+            self.fig.canvas.flush_events()
+              
         f_ave.close()
         f_data.close()
             
