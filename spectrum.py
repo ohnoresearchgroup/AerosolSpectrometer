@@ -53,6 +53,7 @@ class Spectrum():
         self.fig = plt.figure()
         ax = self.fig.add_subplot(1,1,1)
         ax.plot(self.wavelengths, self.aves, 'r-')
+
         
         for (i,wl) in enumerate(self.wavelengths):
             #go to wavelength
@@ -84,6 +85,9 @@ class Spectrum():
             #clear the previous lines, replot the updated line
             ax.clear()
             ax.plot(self.wavelengths, self.aves, 'r-')
+            plt.xlabel('Wavelength [nm]')
+            plt.ylabel('Intensity [c.p.s.]')
+            plt.title(self.name)
             self.fig.canvas.draw()
             self.fig.canvas.flush_events()
               

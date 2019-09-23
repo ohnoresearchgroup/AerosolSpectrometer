@@ -50,3 +50,7 @@ class Spectrometer():
         
     def setDuration(self,duration):
         self.duration = duration
+        
+    def close(self):
+        self.pc.close()
+        self.m.close()
