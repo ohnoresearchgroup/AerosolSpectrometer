@@ -8,6 +8,7 @@ Created on Tue Sep 17 16:23:12 2019
 
 from monochromator import Monochromator
 from photoncounter import PhotonCounter
+from laser import Laser
 from spectrum import Spectrum
 
 import os
@@ -16,14 +17,15 @@ from datetime import datetime
 class Spectrometer():
        
     def __init__(self):
-        self.m = Monochromator('COM5')
-        self.pc = PhotonCounter('COM4')
+        self.m = Monochromator('COM1')
+        self.pc = PhotonCounter('COM3')
+        self.l = Laser('COM4')
         self.scanrange = (400,700,10)
         self.duration = 10
         self.allscans = {}
         
         
-        self.rootdatapath = 'C:\\Users\\paul\\Documents\\Data'
+        self.rootdatapath = 'C:\\Users\\martin_lab\\Documents\\Data'
         self.day = datetime.now().strftime('%Y%m%d')
         self.fullpath = self.rootdatapath + '\\' + self.day 
         
@@ -54,3 +56,4 @@ class Spectrometer():
     def close(self):
         self.pc.close()
         self.m.close()
+        self.l.close()
