@@ -5,7 +5,7 @@ Created on Wed Sep  4 15:13:12 2019
 
 @author: pohno
 """
-
+import time
 #our grating is 1200 G/mm
 
 #serial communications
@@ -39,6 +39,8 @@ class Monochromator():
         
         #default setting of units angstroms
         self.setUnits('angstroms')
+        
+        time.sleep(1)
         
         #check status
         self.checkStatus()
