@@ -69,7 +69,13 @@ class Spectrum():
             
             #for each second, get the data
             for (index,value) in enumerate(data):
-                data[index] = self.pc.getData()
+                #get one data point
+                result = self.pc.getData()
+                # if its nan, execute until gets data point that is a number
+                while np.isnan(result):
+                    result = self.pc.getData()
+                #record data point
+                data[index] = result
                 
             #add the array of data to counts, write to file          
             self.counts.append(data)            

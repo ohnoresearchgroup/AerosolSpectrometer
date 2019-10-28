@@ -9,6 +9,7 @@ Created on Mon Jul  8 21:36:51 2019
 
 import serial
 import time
+import numpy as np
 
 class PhotonCounter():
        
@@ -38,7 +39,7 @@ class PhotonCounter():
         #check status
         self.checkStatus()
 
-
+    #get data from counter, if it can't turn it into an int it returns NaN
     def getData(self):
         #flush buffers
         self.ser.reset_input_buffer()
@@ -51,8 +52,11 @@ class PhotonCounter():
         time.sleep(1.01)
         
         #get result (should be 8 bytes, in hex), turn to int
-        result = int(self.ser.read(8).decode(),16)
-        return result
+        try:
+            result = int(self.ser.read(8).decode(),16)
+            return result
+        except ValueError:
+            return np.nan
 
     def checkStatus(self):
         #flush buffers
