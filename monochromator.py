@@ -37,13 +37,21 @@ class Monochromator():
         #store serial port        
         self.ser = ser
         
+        #default setting of units angstroms
+        self.setUnits('angstroms')
+        
         #check status
         self.checkStatus()
+        
                         
-    #goto
+    #goto position in nanometers
     def goTo(self,position):
         self.ser.reset_input_buffer()
         
+        #convert to angstroms
+        position = position*10
+        
+        #convert to format for monochromator
         (posByte1,posByte2) = self.convertToBytes(position)
         
         #start with empty byte array, build up command
@@ -61,7 +69,7 @@ class Monochromator():
             print('Command not excepted.')
 
             
-    #executes a query for position
+    #executes a query for position, returns in nanometers
     def queryPosition(self):
         self.ser.reset_input_buffer()
         
@@ -77,6 +85,7 @@ class Monochromator():
         posByte2 = reply[1:2]
         
         pos = self.convertFromBytes(posByte1,posByte2)
+        pos = pos/10 #put back in nanometers
         return pos       
 
             
