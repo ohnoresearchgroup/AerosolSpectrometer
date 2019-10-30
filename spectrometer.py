@@ -9,7 +9,7 @@ Created on Tue Sep 17 16:23:12 2019
 from monochromator import Monochromator
 from photoncounter import PhotonCounter
 from laser import Laser
-from spectrum import Spectrum
+from scan import Scan
 
 import os
 from datetime import datetime
@@ -33,8 +33,8 @@ class Spectrometer():
             os.mkdir(self.fullpath)
         
        
-    def startSpectrum(self,name):
-        sp = Spectrum(self.m,self.pc,name,
+    def startScan(self,name):
+        sp = Scan(self.m,self.pc,name,
                      self.scanrange[0],self.scanrange[1],self.scanrange[2],
                      self.duration,
                      self.fullpath)

@@ -10,7 +10,7 @@ import numpy as np
 from datetime import datetime
 import os
 
-class Spectrum():
+class Scan():
        
     def __init__(self,m,pc,name,start,stop,step,duration,path):       
         self.m = m
@@ -32,21 +32,22 @@ class Spectrum():
         self.dirpath = self.path + '\\' + self.time
         os.mkdir(self.dirpath)
         
-        self.createDetailsFile()
         self.runScan()
         
-    def createDetailsFile(self):  
-        f_details  = open(self.dirpath + '\\' + self.time +'_details.txt','w')
-        f_details.write('name\t' + self.name + '\n')
-        f_details.write('time\t' + self.time + '\n')
-        f_details.write('start\t' + str(self.start) + ' nm\n')
-        f_details.write('stop\t' + str(self.stop) + ' nm\n')
-        f_details.write('step\t' + str(self.step) + ' nm\n')
-        f_details.write('duration\t' + str(self.duration) + ' s\n')
-        f_details.close()
     
     def runScan(self):
+        #file for information about the scan and the average counts
         f_ave = open(self.dirpath + '\\' + self.time + '_ave.txt','w+')
+        f_ave.write('name\t' + self.name + '\n')
+        f_ave.write('time\t' + self.time + '\n')
+        f_ave.write('start\t' + str(self.start) + ' nm\n')
+        f_ave.write('stop\t' + str(self.stop) + ' nm\n')
+        f_ave.write('step\t' + str(self.step) + ' nm\n')
+        f_ave.write('duration\t' + str(self.duration) + ' s\n')
+        f_ave.write('\n')
+        f_ave.write('wl\tcounts\n')
+        
+        #file to hold all the data
         f_data = open(self.dirpath + '\\' + self.time + '_data.txt','w+')
         
         #create figure, store it
@@ -96,7 +97,8 @@ class Spectrum():
             plt.title(self.name)
             self.fig.canvas.draw()
             self.fig.canvas.flush_events()
-              
+        
+        #close the two files
         f_ave.close()
         f_data.close()
             
