@@ -10,9 +10,12 @@ from monochromator import Monochromator
 from photoncounter import PhotonCounter
 from laser import Laser
 from scan import Scan
+from timescan import TimeScan
 
 import os
 from datetime import datetime
+import matplotlib.pyplot as plt
+import numpy as np
 
 class Spectrometer():
        
@@ -40,6 +43,16 @@ class Spectrometer():
                      self.fullpath)
         
         self.allscans[sp.time] = sp
+        
+    def startMultScans(self,name,number):
+        for i in range(number):
+            fullname = name + str(number)
+            self.startScan(fullname)
+            
+    def startTimeScan(self,name,duration):
+        ts = TimeScan(self.m,self.pc,name,duration,self.fullpath)
+        
+    
         
     def getScanRange(self):
         print(self.scanrange)
