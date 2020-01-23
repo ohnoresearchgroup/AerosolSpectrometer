@@ -29,7 +29,7 @@ class TimeScan():
     
     def runScan(self):
         #file for information about the scan and the average counts
-        f = open(self.dirpath + '\\' + self.time + '_ave.txt','w+')
+        f = open(self.dirpath + '\\' + self.time + '.txt','w+')
         f.write('name\t' + self.name + '\n')
         f.write('time\t' + self.time + '\n')
         f.write('duration\t' + str(self.duration) + ' s\n')
@@ -39,6 +39,7 @@ class TimeScan():
         
         time = np.arange(self.duration)
         counts = np.zeros(self.duration)
+        counts[:] = np.nan
         
         #create figure, store it
         fig = plt.figure()
