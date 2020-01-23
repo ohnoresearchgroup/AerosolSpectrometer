@@ -21,14 +21,14 @@ class Spectrometer():
        
     def __init__(self):
         self.m = Monochromator('COM1')
-        self.pc = PhotonCounter('COM3')
+        self.pc = PhotonCounter('COM5')
         self.l = Laser('COM4')
         self.scanrange = (400,700,10)
         self.duration = 10
         self.allscans = {}
         
         
-        self.rootdatapath = 'C:\\Users\\martin_lab\\Documents\\Data'
+        self.rootdatapath = 'C:\\Users\\ESL328\\Google Drive\\Data\\Spectra\\2020'
         self.day = datetime.now().strftime('%Y%m%d')
         self.fullpath = self.rootdatapath + '\\' + self.day 
         
@@ -51,8 +51,6 @@ class Spectrometer():
             
     def startTimeScan(self,name,duration):
         ts = TimeScan(self.m,self.pc,name,duration,self.fullpath)
-        
-    
         
     def getScanRange(self):
         print(self.scanrange)
