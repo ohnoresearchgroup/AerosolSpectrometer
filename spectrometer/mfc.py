@@ -50,12 +50,12 @@ class MFC():
     
         
         result = self.ser.read(50).decode()
-        print(result)
+        return result
         
     #set set point on MFC.    
-    def setSetPoint(self,setPoint):
+    def setSP(self,setPoint):
         #put set point in format for MFC
-        sp = setPoint/self.maxFlow*64000
+        sp = int(setPoint/self.maxFlow*64000)
         cmd = 'A' + str(sp) + '\r\n'
         
         #flush buffers
@@ -66,5 +66,6 @@ class MFC():
         self.ser.write(cmd.encode())
         
         result = self.ser.read(50).decode()
-        print(result)
+        sp = float(result.split(' ')[5])
+        return str(sp)
         
