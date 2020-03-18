@@ -6,6 +6,7 @@ Created on Mon Feb 10 16:22:44 2020
 """
 
 from mfc import MFC
+from omegaTRH import OmegaTRH
 
 class TRHcontrol():
        
@@ -13,10 +14,17 @@ class TRHcontrol():
         #initialize MFCs
         self.dryMFC = MFC('COM7',10)
         self.wetMFC = MFC('COM8',20)
+        
+        #RH sensor
+        self.RHsensor = OmegaTRH('COM6')
 
         
         #set total flow rate
         self.totalFlow = 10
+        
+    def getRH(self):
+        rh = self.RHsensor.getRH()
+        print('RH =',rh)
         
         
     def setRH(self,RH):
