@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>rhControlMainWindow</class>
- <widget class="QMainWindow" name="rhControlMainWindow">
+ <class>RHcontrolGUI</class>
+ <widget class="QMainWindow" name="RHcontrolGUI">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>359</width>
-    <height>294</height>
+    <width>488</width>
+    <height>273</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,8 +17,8 @@
    <widget class="QPushButton" name="startPushButton">
     <property name="geometry">
      <rect>
-      <x>210</x>
-      <y>40</y>
+      <x>350</x>
+      <y>30</y>
       <width>113</width>
       <height>32</height>
      </rect>
@@ -27,66 +27,34 @@
      <string>Start</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="stopPushButton">
+   <widget class="QCheckBox" name="setPointcheckBox">
     <property name="geometry">
      <rect>
-      <x>210</x>
-      <y>70</y>
-      <width>113</width>
-      <height>32</height>
+      <x>340</x>
+      <y>160</y>
+      <width>111</width>
+      <height>20</height>
      </rect>
     </property>
     <property name="text">
-     <string>Stop</string>
+     <string>PID Control</string>
     </property>
    </widget>
-   <widget class="QLCDNumber" name="rhDisplay">
+   <widget class="QPlainTextEdit" name="intervalEdit">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>40</y>
-      <width>141</width>
-      <height>61</height>
+      <x>380</x>
+      <y>100</y>
+      <width>81</width>
+      <height>21</height>
      </rect>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label">
-    <property name="geometry">
-     <rect>
-      <x>60</x>
-      <y>20</y>
-      <width>60</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>RH</string>
-    </property>
-    <property name="alignment">
-     <set>Qt::AlignCenter</set>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_2">
-    <property name="geometry">
-     <rect>
-      <x>240</x>
-      <y>20</y>
-      <width>60</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Log</string>
-    </property>
-    <property name="alignment">
-     <set>Qt::AlignCenter</set>
     </property>
    </widget>
    <widget class="QLabel" name="label_3">
     <property name="geometry">
      <rect>
-      <x>170</x>
-      <y>110</y>
+      <x>310</x>
+      <y>100</y>
       <width>60</width>
       <height>16</height>
      </rect>
@@ -98,21 +66,27 @@
      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
     </property>
    </widget>
-   <widget class="QPlainTextEdit" name="intervalEdit">
+   <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>240</x>
-      <y>110</y>
-      <width>81</width>
-      <height>21</height>
+      <x>200</x>
+      <y>10</y>
+      <width>60</width>
+      <height>16</height>
      </rect>
+    </property>
+    <property name="text">
+     <string>RH</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
     </property>
    </widget>
    <widget class="QLabel" name="label_4">
     <property name="geometry">
      <rect>
-      <x>50</x>
-      <y>160</y>
+      <x>200</x>
+      <y>130</y>
       <width>60</width>
       <height>16</height>
      </rect>
@@ -124,24 +98,76 @@
    <widget class="QPlainTextEdit" name="setPointEdit">
     <property name="geometry">
      <rect>
-      <x>30</x>
-      <y>180</y>
+      <x>180</x>
+      <y>150</y>
       <width>101</width>
       <height>41</height>
      </rect>
     </property>
    </widget>
-   <widget class="QCheckBox" name="setPointcheckBox">
+   <widget class="QLabel" name="label_2">
     <property name="geometry">
      <rect>
-      <x>160</x>
-      <y>190</y>
-      <width>87</width>
-      <height>20</height>
+      <x>380</x>
+      <y>10</y>
+      <width>60</width>
+      <height>16</height>
      </rect>
     </property>
     <property name="text">
-     <string>CheckBox</string>
+     <string>Log</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QLCDNumber" name="rhDisplay">
+    <property name="geometry">
+     <rect>
+      <x>160</x>
+      <y>30</y>
+      <width>141</width>
+      <height>61</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="stopPushButton">
+    <property name="geometry">
+     <rect>
+      <x>350</x>
+      <y>60</y>
+      <width>113</width>
+      <height>32</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Stop</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="connectSensorPushButton">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>40</y>
+      <width>131</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Connect Sensor</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="connectMFCpushButton">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>150</y>
+      <width>131</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Connect MFCs</string>
     </property>
    </widget>
   </widget>
@@ -150,7 +176,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>359</width>
+     <width>488</width>
      <height>22</height>
     </rect>
    </property>
