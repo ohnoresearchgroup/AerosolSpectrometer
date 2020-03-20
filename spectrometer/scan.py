@@ -12,30 +12,31 @@ import os
 
 class Scan():
        
-    def __init__(self,m,pc,name,start,stop,step,duration,path):       
+    def __init__(self,m,pc,start,stop,step,duration):       
         self.m = m
         self.pc = pc
         
-        self.name = name
         self.time = datetime.now().strftime('%Y%m%d_%H%M%S')
         self.start = start
         self.stop = stop
         self.step = step
         self.duration = duration
-        self.path = path
         
         self.wavelengths = np.arange(start,stop+step,step)
         self.counts = []
         self.aves = np.zeros(len(self.wavelengths))
         self.aves[:] = np.nan
-          
-        self.dirpath = self.path + '\\' + self.time
-        os.mkdir(self.dirpath)
         
-        self.runScan()
+        #make path for day in spectra folder if needed        
+        self.rootdatapath = 'C:\\Users\\ESL328\\Google Drive\\Data\\Spectra\\2020'
+        self.day = datetime.now().strftime('%Y%m%d')
+        self.fullpath = self.rootdatapath + '\\' + self.day        
+        if not os.path.exists(self.fullpath):
+            os.mkdir(self.fullpath)
+
         
     
-    def runScan(self):
+    def start(self):
         #file for information about the scan and the average counts
         f_ave = open(self.dirpath + '\\' + self.time + '_ave.txt','w+')
         f_ave.write('name\t' + self.name + '\n')

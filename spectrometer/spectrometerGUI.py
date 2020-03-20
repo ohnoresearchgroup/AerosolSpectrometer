@@ -138,6 +138,14 @@ class Ui_spectrometerGUI(object):
         self.label_8.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.label_8.setObjectName("label_8")
         
+        ##########signals and slots###########
+        self.connectMonochromatorPushButton.clicked.connect(self.spectrometer.initMonochromator)
+        self.connectPhotonCounterPushButton.clicked.connect(self.spectrometer.initPhotonCounter)
+        self.connectLaserArdPushButton.clicked.connect(self.spectrometer.initLaserArd)
+        self.startScanPushButton.clicked.connect(self.startScanFunc)
+        self.startTimeScanPushButton.clicked.connect(self.startTimeScanFunc)
+        self.stopScanPushButton.clicked.connect(self.stopScanFunc)
+        
         #main
         spectrometerGUI.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(spectrometerGUI)
@@ -177,6 +185,32 @@ class Ui_spectrometerGUI(object):
         self.startMultiScanPushButton.setText(_translate("spectrometerGUI", "Start Multi Scans"))
         self.cancelMultiScansPushButton.setText(_translate("spectrometerGUI", "Cancel Scans"))
         self.label_8.setText(_translate("spectrometerGUI", "Number"))
+        
+    def startScanFunc(self):
+        self.spectrometer.startScan()
+        print('Started scan.')
+        
+    def startTimeScanFunc(self):
+        self.spectrometer.startTimeScan()
+        print('Started timescan.')
+        
+    def stopScanFunc(self):
+        self.spectrometer.stopScan()
+        print('Stopped scan.')
+        
+    def getScanMin(self):
+        return float(self.scanMinPlainTextEdit.toPlainText())
+    
+    def getScanMax(self):
+        return float(self.scanMaxPlainTextEdit.toPlainText())
+
+    def getScanInterval(self):
+        return float(self.scanIntervalPlainTextEdit.toPlainText())    
+
+    def getScanDuration(self):
+        return float(self.scanDurationPlainTextEdit.toPlainText())
+    
+
 
 
 if __name__ == "__main__":

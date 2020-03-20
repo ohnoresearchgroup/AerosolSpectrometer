@@ -6,13 +6,12 @@ Created on Wed Mar 18 11:28:19 2020
 @author: pohno
 """
 
-import random
 from datetime import datetime
 import os
 import matplotlib.pyplot as plt
 from lib.repeattimer import RepeatTimer
 
-class AcquisitionRH():    
+class LogRH():    
     def __init__(self,interval,rhcontrol):
         self.interval = interval
         self.rhcontrol = rhcontrol

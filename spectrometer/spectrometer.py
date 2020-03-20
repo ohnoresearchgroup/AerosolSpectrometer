@@ -12,28 +12,13 @@ from spectrometer.laser import Laser
 from spectrometer.scan import Scan
 from spectrometer.timescan import TimeScan
 
-import os
-from datetime import datetime
-import matplotlib.pyplot as plt
-import numpy as np
-
 class Spectrometer():
        
     def __init__(self):
         
-        
-        
-        self.scanrange = (400,700,10)
-        self.duration = 10
         self.allscans = {}
+        self.alltimescans = {}
         
-        
-        self.rootdatapath = 'C:\\Users\\ESL328\\Google Drive\\Data\\Spectra\\2020'
-        self.day = datetime.now().strftime('%Y%m%d')
-        self.fullpath = self.rootdatapath + '\\' + self.day 
-        
-        if not os.path.exists(self.fullpath):
-            os.mkdir(self.fullpath)
             
     def assignWindow(self,window):
         self.window = window
@@ -44,39 +29,32 @@ class Spectrometer():
     def initPhotonCounter(self):
         self.pc = PhotonCounter('COM5')
         
-    def initLaser(self):
+    def initLaserArd(self):
         self.l = Laser('COM4')
         
+    def startScan(self):
+        scan = Scan(self.m,self.pc,
+                     self.window.getScanMin(),
+                     self.window.getScanMax(),
+                     self.window.getScanInterval(),
+                     self.window.getScanDuration())
         
+        self.allscans[scan.time] = scan
+        self.currentscan = scan
+        scan.start()
         
-       
-    def startScan(self,name):
-        sp = Scan(self.m,self.pc,name,
-                     self.scanrange[0],self.scanrange[1],self.scanrange[2],
-                     self.duration,
-                     self.fullpath)
+    def startTimeScan(self):
+        ts = TimeScan(self.m,self.pc)
+        self.alltimescans[ts.time] = ts
+        self.currentscan = ts
         
-        self.allscans[sp.time] = sp
+    def stopScan(self):
+        self.currentscan.stop()
         
-    def startMultScans(self,name,number):
+    def startMultScans(self,number):
         for i in range(number):
-            fullname = name + str(number)
-            self.startScan(fullname)
-            
-    def startTimeScan(self,name,duration):
-        ts = TimeScan(self.m,self.pc,name,duration,self.fullpath)
-        
-    def getScanRange(self):
-        print(self.scanrange)
-        
-    def setScanRange(self,scanrange):
-        self.scanrange = scanrange
-        
-    def getDuration(self):
-        print(self.duration)
-        
-    def setDuration(self,duration):
-        self.duration = duration
+            self.startScan()
+
         
     def close(self):
         self.pc.close()

@@ -23,19 +23,16 @@ class Ui_RHcontrolGUI(object):
         self.connectSensorPushButton = QtWidgets.QPushButton(self.centralwidget)
         self.connectSensorPushButton.setGeometry(QtCore.QRect(20, 40, 131, 51))
         self.connectSensorPushButton.setObjectName("connectSensorPushButton")
-        self.connectSensorPushButton.clicked.connect(self.rhcontrol.initSensor)
         
         #start push button
         self.startPushButton = QtWidgets.QPushButton(self.centralwidget)
         self.startPushButton.setGeometry(QtCore.QRect(350, 30, 113, 32))
         self.startPushButton.setObjectName("startPushButton")
-        self.startPushButton.clicked.connect(self.startFunc)
-        
+                
         #stop push button
         self.stopPushButton = QtWidgets.QPushButton(self.centralwidget)
         self.stopPushButton.setGeometry(QtCore.QRect(350, 60, 113, 32))
         self.stopPushButton.setObjectName("stopPushButton")
-        self.stopPushButton.clicked.connect(self.stopFunc)
         
         #interval edit
         self.intervalEdit = QtWidgets.QPlainTextEdit(self.centralwidget)
@@ -52,7 +49,6 @@ class Ui_RHcontrolGUI(object):
         self.connectMFCpushButton = QtWidgets.QPushButton(self.centralwidget)
         self.connectMFCpushButton.setGeometry(QtCore.QRect(20, 150, 131, 51))
         self.connectMFCpushButton.setObjectName("connectMFCpushButton")
-        self.connectMFCpushButton.clicked.connect(self.rhcontrol.initMFCs)
          
         #set point check box
         self.setPointcheckBox = QtWidgets.QCheckBox(self.centralwidget)
@@ -80,7 +76,13 @@ class Ui_RHcontrolGUI(object):
         self.label_4 = QtWidgets.QLabel(self.centralwidget)
         self.label_4.setGeometry(QtCore.QRect(200, 130, 60, 16))
         self.label_4.setObjectName("label_4")
-       
+        
+        ############signals and slots######
+        self.connectSensorPushButton.clicked.connect(self.rhcontrol.initSensor)
+        self.startPushButton.clicked.connect(self.startFunc)
+        self.stopPushButton.clicked.connect(self.stopFunc)
+        self.connectMFCpushButton.clicked.connect(self.rhcontrol.initMFCs)
+        
         #central widget
         RHcontrolGUI.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(RHcontrolGUI)

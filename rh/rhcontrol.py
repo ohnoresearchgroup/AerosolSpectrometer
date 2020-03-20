@@ -7,7 +7,7 @@ Created on Mon Feb 10 16:22:44 2020
 
 from rh.mfc import MFC
 from rh.omegaTRH import OmegaTRH
-from rh.acquisitionRH import AcquisitionRH
+from rh.logRH import LogRH
 
 class RHcontrol():
        
@@ -22,13 +22,13 @@ class RHcontrol():
 
     def initMFCs(self):
         #initialize MFCs
-        #self.dryMFC = MFC('COM7',10)
-        #self.wetMFC = MFC('COM8',20)
+        self.dryMFC = MFC('COM7',10)
+        self.wetMFC = MFC('COM8',20)
         print('MFCs initialized.')
    
     def initSensor(self):
         #RH sensor
-        #self.RHsensor = OmegaTRH('COM6')
+        self.RHsensor = OmegaTRH('COM6')
         print('Sensor initialized.')
         
     def getRH(self):
@@ -38,12 +38,12 @@ class RHcontrol():
     def updateWindow(self,rh):
         self.window.updateLCD(rh)
         
-    def startAcquisition(self):
-        self.acq = AcquisitionRH(self.window.getInterval(),self)
-        self.acq.start()
+    def startLog(self):
+        self.log = LogRH(self.window.getInterval(),self)
+        self.log.start()
         
-    def stopAcquisition(self):
-        self.acq.stop()
+    def stopLog(self):
+        self.log.stop()
         
     def setRatio(self,ratio):
         wetFlow = ratio*self.totalFlow
