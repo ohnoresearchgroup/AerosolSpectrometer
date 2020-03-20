@@ -33,7 +33,7 @@ class RHcontrol():
         
     def getRH(self):
         rh = self.RHsensor.getRH()
-        print('RH =',rh)
+        return rh
         
     def updateWindow(self,rh):
         self.window.updateLCD(rh)

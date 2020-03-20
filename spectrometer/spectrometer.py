@@ -6,11 +6,11 @@ Created on Tue Sep 17 16:23:12 2019
 @author: pohno
 """
 
-from monochromator import Monochromator
-from photoncounter import PhotonCounter
-from laser import Laser
-from scan import Scan
-from timescan import TimeScan
+from spectrometer.monochromator import Monochromator
+from spectrometer.photoncounter import PhotonCounter
+from spectrometer.laser import Laser
+from spectrometer.scan import Scan
+from spectrometer.timescan import TimeScan
 
 import os
 from datetime import datetime
@@ -20,9 +20,9 @@ import numpy as np
 class Spectrometer():
        
     def __init__(self):
-        self.m = Monochromator('COM1')
-        self.pc = PhotonCounter('COM5')
-        self.l = Laser('COM4')
+        
+        
+        
         self.scanrange = (400,700,10)
         self.duration = 10
         self.allscans = {}
@@ -34,6 +34,20 @@ class Spectrometer():
         
         if not os.path.exists(self.fullpath):
             os.mkdir(self.fullpath)
+            
+    def assignWindow(self,window):
+        self.window = window
+            
+    def initMonochromator(self):
+        self.m = Monochromator('COM1')
+        
+    def initPhotonCounter(self):
+        self.pc = PhotonCounter('COM5')
+        
+    def initLaser(self):
+        self.l = Laser('COM4')
+        
+        
         
        
     def startScan(self,name):

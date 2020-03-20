@@ -9,6 +9,8 @@
 from PyQt5 import QtCore, QtWidgets
 from rh.rhcontrol import RHcontrol
 from rh.rhControlGUI import Ui_RHcontrolGUI
+from spectrometer.spectrometerGUI import Ui_spectrometerGUI
+from spectrometer.spectrometer import Spectrometer
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -27,6 +29,9 @@ class Ui_MainWindow(object):
         self.spectrometerPushButton = QtWidgets.QPushButton(self.centralwidget)
         self.spectrometerPushButton.setGeometry(QtCore.QRect(50, 90, 181, 61))
         self.spectrometerPushButton.setObjectName("spectrometerPushButton")
+        self.spectrometerPushButton.clicked.connect(self.openSpectrometer)
+        
+        #main window
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 291, 22))
@@ -51,6 +56,12 @@ class Ui_MainWindow(object):
     def openRHcontrol(self):
         #show the RH control window
         rhWindow.show()
+        
+    def initSpectrometer(self):
+        self.spectrometer = Spectrometer()
+        
+    def openSpectrometer(self):
+        spectrometerWindow.show()
 
 
 
@@ -71,6 +82,15 @@ if __name__ == "__main__":
     uiRH.setupUi(rhWindow,uiMain.rhcontrol)
     #give RH control object the window
     uiMain.rhcontrol.assignWindow(uiRH)
+    
+    #creae window for spectrometer control (doesn't show it yet)
+    uiMain.initSpectrometer()
+    spectrometerWindow = QtWidgets.QMainWindow()
+    uiSpec = Ui_spectrometerGUI()
+    #give spectrometer gui the spectrometer object
+    uiSpec.setupUi(spectrometerWindow,uiMain.spectrometer)
+    #give spectrometer object the window
+    uiMain.spectrometer.assignWindow(uiSpec)
     
     #for exit
     sys.exit(app.exec_())

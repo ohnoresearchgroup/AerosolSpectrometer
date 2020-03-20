@@ -16,7 +16,6 @@ class AcquisitionRH():
     def __init__(self,interval,rhcontrol):
         self.interval = interval
         self.rhcontrol = rhcontrol
-        print(interval)
         
         #create timer to trigger RH reading
         self.timer = RepeatTimer(interval, self.getRHdata)  
@@ -59,7 +58,8 @@ class AcquisitionRH():
     def getRHdata(self):
         #get new data and append
         time = datetime.now().strftime('%Y_%m%d_%H:%M:%S')
-        rh = round(random.random(),3)      
+        rh = self.rhcontrol.getRH()   
+        
         self.times.append(time)
         self.rhs.append(rh)
         
