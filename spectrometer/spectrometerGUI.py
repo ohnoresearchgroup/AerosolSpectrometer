@@ -64,10 +64,10 @@ class Ui_spectrometerGUI(object):
         self.scanMaxPlainTextEdit.setGeometry(QtCore.QRect(578, 70, 41, 31))
         self.scanMaxPlainTextEdit.setObjectName("scanMaxPlainTextEdit")
         
-        #scan interval edit
-        self.scanIntervalPlainTextEdit = QtWidgets.QPlainTextEdit(self.centralwidget)
-        self.scanIntervalPlainTextEdit.setGeometry(QtCore.QRect(578, 100, 41, 31))
-        self.scanIntervalPlainTextEdit.setObjectName("scanIntervalPlainTextEdit")
+        #scan step edit
+        self.scanStepPlainTextEdit = QtWidgets.QPlainTextEdit(self.centralwidget)
+        self.scanStepPlainTextEdit.setGeometry(QtCore.QRect(578, 100, 41, 31))
+        self.scanStepPlainTextEdit.setObjectName("scanStepPlainTextEdit")
         
         #scan duration edit
         self.scanDurationPlainTextEdit = QtWidgets.QPlainTextEdit(self.centralwidget)
@@ -145,6 +145,7 @@ class Ui_spectrometerGUI(object):
         self.startScanPushButton.clicked.connect(self.startScanFunc)
         self.startTimeScanPushButton.clicked.connect(self.startTimeScanFunc)
         self.stopScanPushButton.clicked.connect(self.stopScanFunc)
+        self.setMonochromatorPushButton.clicked.connect(self.setMonochromatorPositionFunc)
         
         #main
         spectrometerGUI.setCentralWidget(self.centralwidget)
@@ -168,11 +169,11 @@ class Ui_spectrometerGUI(object):
         self.connectLaserArdPushButton.setText(_translate("spectrometerGUI", "Connect Laser"))
         self.laserCheckBox.setText(_translate("spectrometerGUI", "Laser On"))
         self.scanMaxPlainTextEdit.setPlainText(_translate("spectrometerGUI", "700"))
-        self.scanIntervalPlainTextEdit.setPlainText(_translate("spectrometerGUI", "2"))
+        self.scanStepPlainTextEdit.setPlainText(_translate("spectrometerGUI", "2"))
         self.scanDurationPlainTextEdit.setPlainText(_translate("spectrometerGUI", "5"))
         self.label.setText(_translate("spectrometerGUI", "Min"))
         self.label_2.setText(_translate("spectrometerGUI", "Max"))
-        self.label_3.setText(_translate("spectrometerGUI", "Step Interval"))
+        self.label_3.setText(_translate("spectrometerGUI", "Step"))
         self.label_4.setText(_translate("spectrometerGUI", "Step Duration"))
         self.label_5.setText(_translate("spectrometerGUI", "Scans"))
         self.label_6.setText(_translate("spectrometerGUI", "Hardware Connections"))
@@ -204,12 +205,18 @@ class Ui_spectrometerGUI(object):
     def getScanMax(self):
         return float(self.scanMaxPlainTextEdit.toPlainText())
 
-    def getScanInterval(self):
-        return float(self.scanIntervalPlainTextEdit.toPlainText())    
+    def getScanStep(self):
+        return float(self.scanStepPlainTextEdit.toPlainText())    
 
     def getScanDuration(self):
         return float(self.scanDurationPlainTextEdit.toPlainText())
     
+    def updateMonochromatorLCD(self,position):
+        self.monochromatorLcdNumber.display(position)
+    
+    def setMonochromatorPositionFunc(self):
+        self.spectrometer.monochromatorGoTo(float(self.setMonochromatorPlainTextEdit.toPlainText()))
+        
 
 
 

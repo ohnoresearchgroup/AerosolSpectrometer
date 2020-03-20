@@ -26,8 +26,9 @@ class LogRH():
         if not os.path.exists(self.fullpath):
             os.makedirs(self.fullpath)
             
-            
+        #time when called
         self.time = datetime.now().strftime('%Y%m%d_%H%M%S')
+        
         #file name after time started
         self.file = open(self.fullpath + '/' + self.time + '.txt','w+')
         self.file.write('starttime\t' + self.time + '\n')

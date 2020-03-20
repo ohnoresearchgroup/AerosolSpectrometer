@@ -12,27 +12,25 @@ import os
 
 class TimeScan():
        
-    def __init__(self,m,pc,name,duration,path):       
-        self.m = m
+    def __init__(self,pc):       
+        #photon counter to get data
         self.pc = pc
-        
-        self.name = name
+
+        #time triggered
         self.time = datetime.now().strftime('%Y%m%d_%H%M%S')
-        self.duration = duration
-        self.path = path
-          
-        self.dirpath = self.path + '\\' + self.time
-        os.mkdir(self.dirpath)
         
-        self.runScan()
+        #make path for day in spectra folder if needed        
+        self.rootdatapath = '/Users/pohno/Desktop/python/rh/2020'
+        self.day = datetime.now().strftime('%Y%m%d')
+        self.fullpath = self.rootdatapath + '/' + self.day        
+        if not os.path.exists(self.fullpath):
+            os.mkdir(self.fullpath)
         
     
-    def runScan(self):
+    def startTimeScan(self):
         #file for information about the scan and the average counts
-        f = open(self.dirpath + '\\' + self.time + '.txt','w+')
-        f.write('name\t' + self.name + '\n')
+        f = open(self.dirpath + '/' + self.time + '_timescan.txt','w+')
         f.write('time\t' + self.time + '\n')
-        f.write('duration\t' + str(self.duration) + ' s\n')
         f.write('\n')
         f.write('time\tcounts\n')
 
@@ -68,6 +66,9 @@ class TimeScan():
                 f.write(str(index))
                 f.write('\t' + str(result) + '\n')
 
-        f.close()         
+        f.close()    
+        
+    def stop(self):
+        print('Timescan stopped.')
         
             

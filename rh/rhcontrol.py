@@ -8,6 +8,7 @@ Created on Mon Feb 10 16:22:44 2020
 from rh.mfc import MFC
 from rh.omegaTRH import OmegaTRH
 from rh.logRH import LogRH
+import threading
 
 class RHcontrol():
        
@@ -40,7 +41,10 @@ class RHcontrol():
         
     def startLog(self):
         self.log = LogRH(self.window.getInterval(),self)
-        self.log.start()
+        
+        #open new thread to handle log
+        thread = threading.Thread(target=self.log.start)
+        thread.start()
         
     def stopLog(self):
         self.log.stop()

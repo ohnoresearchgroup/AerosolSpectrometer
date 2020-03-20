@@ -6,7 +6,7 @@
 #
 # WARNING! All changes made in this file will be lost!
 
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtCore, QtWidgets
 
 class Ui_RHcontrolGUI(object):
     def setupUi(self, RHcontrolGUI, rhcontrol):
@@ -111,12 +111,12 @@ class Ui_RHcontrolGUI(object):
         self.connectMFCpushButton.setText(_translate("RHcontrolGUI", "Connect MFCs"))
 
     def startFunc(self):
-        self.rhcontrol.startAcquisition()
-        print('Started acquisition.')
+        self.rhcontrol.startLog()
+        print('Started log.')
         
     def stopFunc(self):
-        self.rhcontrol.stopAcquisition()
-        print('Stopped acquisition.')
+        self.rhcontrol.stopLog()
+        print('Stopped log.')
         
     def updateLCD(self,rh):
         self.rhDisplay.display(rh)

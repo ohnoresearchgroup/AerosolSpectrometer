@@ -11,6 +11,7 @@ from spectrometer.photoncounter import PhotonCounter
 from spectrometer.laser import Laser
 from spectrometer.scan import Scan
 from spectrometer.timescan import TimeScan
+import threading
 
 class Spectrometer():
        
@@ -24,29 +25,39 @@ class Spectrometer():
         self.window = window
             
     def initMonochromator(self):
-        self.m = Monochromator('COM1')
+        #########self.m = Monochromator('COM1')############
+        self.m = 'mono' #########delete########
         
     def initPhotonCounter(self):
-        self.pc = PhotonCounter('COM5')
+        ######self.pc = PhotonCounter('COM5')#############
+        self.pc = 'pc' ##########delete###########
         
     def initLaserArd(self):
         self.l = Laser('COM4')
         
     def startScan(self):
-        scan = Scan(self.m,self.pc,
+        self.currentscan = Scan(self.m,self.pc,
                      self.window.getScanMin(),
                      self.window.getScanMax(),
-                     self.window.getScanInterval(),
-                     self.window.getScanDuration())
+                     self.window.getScanStep(),
+                     int(self.window.getScanDuration()),self)        
+        self.allscans[self.currentscan.time] = self.currentscan
         
-        self.allscans[scan.time] = scan
-        self.currentscan = scan
-        scan.start()
-        
+        #open new thread to handle scan
+        thread = threading.Thread(target=self.currentscan.startScan)
+        thread.start()
+       
     def startTimeScan(self):
-        ts = TimeScan(self.m,self.pc)
-        self.alltimescans[ts.time] = ts
-        self.currentscan = ts
+        self.currentscan = TimeScan(self.m,self.pc)
+        self.alltimescans[self.currentscan.time] = self.currentscan
+        self.currentscan.start()
+        
+    def updateMonochromatorWindow(self,position):
+        self.window.updateMonochromatorLCD(position)
+        
+    def monochromatorGoTo(self,position):
+        ##########self.m.goTo(position)################
+        self.updateMonochromatorWindow(position)
         
     def stopScan(self):
         self.currentscan.stop()
