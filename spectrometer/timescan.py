@@ -57,16 +57,14 @@ class TimeScan():
     
     def startScan(self):
         
-        while self.stop == False:
+        while self.spectrometer.stopFlag == False:
             #######result = self.pc.getData()########
             time.sleep(1)   ######delete
             result = 1      ######delete
             
             self.times.append(self.timeIndex)
             self.counts.append(result)
-            
-
-            
+                   
             #write to file
             self.file = open(self.fullpath + '/' + self.time + '_timescan.txt','a')
             self.file.write(str(self.timeIndex) + '\t' + str(result) + '\n')

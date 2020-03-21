@@ -13,20 +13,18 @@ import time
 
 class Scan():
        
-    def __init__(self,m,pc,start,stop,step,duration,spectrometer):       
-        #get monochromator and pc objects
-        self.m = m
-        self.pc = pc
-        
+    def __init__(self,start,stop,step,duration,spectrometer):            
         #get scan parameters
         self.start = start
         self.stop = stop
         self.step = step
         self.duration = duration
         
-        #get spectrometer object
+        #get spectrometer and other objects
         self.spectrometer = spectrometer
-        
+        self.m = self.spectrometer.m
+        self.pc = self.spectrometer.pc
+           
         #calculate wavelengths and initialize arrays for data
         self.wavelengths = np.arange(start,stop+step,step)
         self.counts = []
@@ -64,51 +62,57 @@ class Scan():
         self.ax.plot(self.wavelengths, self.aves, 'r-')
         
     def startScan(self):
+        print('scan started')
+        #open file
         self.file = open(self.fullpath + '/' + self.time + '_scan.txt','a')
+        
+        #enumerate over each wavelength
         for (i,wl) in enumerate(self.wavelengths):
-            #go to wavelength
-            ################self.m.goTo(wl)#############
-            #update spectrometer window
-            self.spectrometer.updateMonochromatorWindow(wl)         
-            #write wavelength to file
-            self.file.write(str(wl))
-            
-            #initialize array to hold data
-            data = np.zeros(self.duration)
-            #for each second, get the data
-            for (index,value) in enumerate(data):
-                #get one data point
-                time.sleep(0.5)
-                result = 1
-                ###########result = self.pc.getData()###############
-                # if its nan, execute until gets data point that is a number
-                while np.isnan(result):
-                    result = self.pc.getData()
-                #record data point
-                data[index] = result
-            #add the mean to aves, write to file
-            ave = np.mean(data)
-            self.aves[i] = ave
-            self.file.write('\t' + str(ave))
-            print('Ave = ' + str(ave) + ' c.p.s.')
+            #check if stop flag has been set
+            if self.spectrometer.stopFlag == True:
+                break
+            else:
+                #go to wavelength
+                ################self.m.goTo(wl)#############
+                #update spectrometer window
+                self.spectrometer.updateMonochromatorWindow(wl)         
+                #write wavelength to file
+                self.file.write(str(wl))
+                
+                #initialize array to hold data
+                data = np.zeros(self.duration)
+                #for each second, get the data
+                for (index,value) in enumerate(data):
+                    #get one data point
+                    time.sleep(0.5)
+                    result = 1
+                    ###########result = self.pc.getData()###############
+                    # if its nan, execute until gets data point that is a number
+                    while np.isnan(result):
+                        result = self.pc.getData()
+                    #record data point
+                    data[index] = result
+                #add the mean to aves, write to file
+                ave = np.mean(data)
+                self.aves[i] = ave
+                self.file.write('\t' + str(ave))
+                print('Ave = ' + str(ave) + ' c.p.s.')
                                  
-            #add the array of data to counts, write to file          
-            self.counts.append(data)            
-            string = np.array2string(data,separator='\t')[1:][:-1]
-            self.file.write('\t' + string + '\n')
+                #add the array of data to counts, write to file          
+                self.counts.append(data)            
+                string = np.array2string(data,separator='\t')[1:][:-1]
+                self.file.write('\t' + string + '\n')
             
-            #clear the previous lines, replot the updated line
-            self.ax.clear()
-            self.ax.plot(self.wavelengths, self.aves, 'r-')
-            plt.xlabel('Wavelength [nm]')
-            plt.ylabel('Intensity [c.p.s.]')
-            plt.title(self.time)
-            self.fig.canvas.draw()
-            self.fig.canvas.flush_events()
+                #clear the previous lines, replot the updated line
+                self.ax.clear()
+                self.ax.plot(self.wavelengths, self.aves, 'r-')
+                plt.xlabel('Wavelength [nm]')
+                plt.ylabel('Intensity [c.p.s.]')
+                plt.title(self.time)
+                self.fig.canvas.draw()
+                self.fig.canvas.flush_events()
+        
         #close the file
         self.file.close()
-              
-    def stop(self):
-        print('Scan stopped.')
-
+        print('scan returned')
             

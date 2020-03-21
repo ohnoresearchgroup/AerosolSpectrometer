@@ -100,9 +100,9 @@ class Ui_spectrometerGUI(object):
         self.setNumberMultiPlainTextEdit.setObjectName("setNumberMultiPlainTextEdit")
         
         #cancel multi scans push button
-        self.cancelMultiScansPushButton = QtWidgets.QPushButton(self.centralwidget)
-        self.cancelMultiScansPushButton.setGeometry(QtCore.QRect(350, 200, 141, 32))
-        self.cancelMultiScansPushButton.setObjectName("cancelMultiScansPushButton")
+        self.cancelMultiScanPushButton = QtWidgets.QPushButton(self.centralwidget)
+        self.cancelMultiScanPushButton.setGeometry(QtCore.QRect(350, 200, 141, 32))
+        self.cancelMultiScanPushButton.setObjectName("cancelMultiScanPushButton")
         
         #labels
         self.label = QtWidgets.QLabel(self.centralwidget)
@@ -146,6 +146,8 @@ class Ui_spectrometerGUI(object):
         self.startTimeScanPushButton.clicked.connect(self.startTimeScanFunc)
         self.stopScanPushButton.clicked.connect(self.stopScanFunc)
         self.setMonochromatorPushButton.clicked.connect(self.setMonochromatorPositionFunc)
+        self.startMultiScanPushButton.clicked.connect(self.startMultiScan)
+        self.cancelMultiScanPushButton.clicked.connect(self.cancelMultiScan)
         
         #main
         spectrometerGUI.setCentralWidget(self.centralwidget)
@@ -183,8 +185,9 @@ class Ui_spectrometerGUI(object):
         self.setMonochromatorPlainTextEdit.setPlainText(_translate("spectrometerGUI", "400"))
         self.setMonochromatorPushButton.setText(_translate("spectrometerGUI", "Set"))
         self.label_7.setText(_translate("spectrometerGUI", "Monochromator"))
-        self.startMultiScanPushButton.setText(_translate("spectrometerGUI", "Start Multi Scans"))
-        self.cancelMultiScansPushButton.setText(_translate("spectrometerGUI", "Cancel Scans"))
+        self.startMultiScanPushButton.setText(_translate("spectrometerGUI", "Start Multi Scan"))
+        self.cancelMultiScanPushButton.setText(_translate("spectrometerGUI", "Cancel Scans"))
+        self.setNumberMultiPlainTextEdit.setPlainText(_translate("spectrometerGUI", "Inf"))
         self.label_8.setText(_translate("spectrometerGUI", "Number"))
         
     def startScanFunc(self):
@@ -199,6 +202,14 @@ class Ui_spectrometerGUI(object):
         self.spectrometer.stopScan()
         print('Stopped scan.')
         
+    def startMultiScan(self):
+        self.spectrometer.startMultiScan()
+        print('Start multiscan.')
+        
+    def cancelMultiScan(self):
+        self.spectrometer.cancelMultiScan()
+        print('Canceled multiscan.')
+        
     def getScanMin(self):
         return float(self.scanMinPlainTextEdit.toPlainText())
     
@@ -210,6 +221,9 @@ class Ui_spectrometerGUI(object):
 
     def getScanDuration(self):
         return float(self.scanDurationPlainTextEdit.toPlainText())
+    
+    def getMultiScanNumber(self):
+        return self.setNumberMultiPlainTextEdit.toPlainText()
     
     def updateMonochromatorLCD(self,position):
         self.monochromatorLcdNumber.display(position)
