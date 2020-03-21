@@ -27,6 +27,7 @@ class Spectrometer():
     def initMonochromator(self):
         #########self.m = Monochromator('COM1')############
         self.m = 'mono' #########delete########
+        #######self.monochromatorGoTo(400)#########
         
     def initPhotonCounter(self):
         ######self.pc = PhotonCounter('COM5')#############
@@ -48,9 +49,12 @@ class Spectrometer():
         thread.start()
        
     def startTimeScan(self):
-        self.currentscan = TimeScan(self.m,self.pc)
+        self.currentscan = TimeScan(self)
         self.alltimescans[self.currentscan.time] = self.currentscan
-        self.currentscan.start()
+        
+        #open new thread to handle scan
+        thread = threading.Thread(target=self.currentscan.startScan)
+        thread.start()
         
     def updateMonochromatorWindow(self,position):
         self.window.updateMonochromatorLCD(position)
@@ -60,7 +64,7 @@ class Spectrometer():
         self.updateMonochromatorWindow(position)
         
     def stopScan(self):
-        self.currentscan.stop()
+        self.currentscan.stop == True
         
     def startMultScans(self,number):
         for i in range(number):

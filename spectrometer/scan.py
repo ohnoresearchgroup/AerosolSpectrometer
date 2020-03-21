@@ -50,8 +50,7 @@ class Scan():
         self.file.write('stop\t' + str(self.stop) + ' nm\n')
         self.file.write('step\t' + str(self.step) + ' nm\n')
         self.file.write('duration\t' + str(self.duration) + ' s\n')
-        self.file.write('\n')
-        
+        self.file.write('\n')       
         title = 'wl\tcounts'
         for i in range(self.duration):
             title = title + '\tpt' + str(i+1)
