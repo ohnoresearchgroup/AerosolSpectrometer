@@ -13,7 +13,7 @@ import time
 
 class Scan():
        
-    def __init__(self,start,stop,step,duration,spectrometer):            
+    def __init__(self,start,stop,step,duration,spectrometer,sds):            
         #get scan parameters
         self.start = start
         self.stop = stop
@@ -24,6 +24,9 @@ class Scan():
         self.spectrometer = spectrometer
         self.m = self.spectrometer.m
         self.pc = self.spectrometer.pc
+        
+        #scan done signal
+        self.sds = sds
            
         #calculate wavelengths and initialize arrays for data
         self.wavelengths = np.arange(start,stop+step,step)
@@ -60,9 +63,9 @@ class Scan():
         self.fig = plt.figure()
         self.ax = self.fig.add_subplot(1,1,1)
         self.ax.plot(self.wavelengths, self.aves, 'r-')
+        plt.show()
         
     def startScan(self):
-        print('scan started')
         #open file
         self.file = open(self.fullpath + '/' + self.time + '_scan.txt','a')
         
@@ -70,6 +73,8 @@ class Scan():
         for (i,wl) in enumerate(self.wavelengths):
             #check if stop flag has been set
             if self.spectrometer.stopFlag == True:
+                self.spectrometer.multiScanFlag = False
+                self.sds.trigger.disconnect()
                 break
             else:
                 #go to wavelength
@@ -96,7 +101,6 @@ class Scan():
                 ave = np.mean(data)
                 self.aves[i] = ave
                 self.file.write('\t' + str(ave))
-                print('Ave = ' + str(ave) + ' c.p.s.')
                                  
                 #add the array of data to counts, write to file          
                 self.counts.append(data)            
@@ -114,5 +118,21 @@ class Scan():
         
         #close the file
         self.file.close()
-        print('scan returned')
-            
+        self.checkMultiScan()
+        
+        
+    def checkMultiScan(self):
+        if self.spectrometer.multiScanFlag == False:
+            self.sds.trigger.disconnect()
+            print('Scan complete.')
+            return
+        elif self.spectrometer.multiScanIndex == self.spectrometer.multiScanNumber:
+            self.spectrometer.multiScanFlag = False
+            print('Reached end of multiscan.')
+            self.sds.trigger.disconnect()
+            return
+        else:
+            self.spectrometer.multiScanIndex = self.spectrometer.multiScanIndex + 1
+            print('Individual scan complete.')
+            self.sds.trigger.emit()
+                    

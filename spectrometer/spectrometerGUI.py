@@ -7,6 +7,7 @@
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtCore import QObject, pyqtSignal
 
 class Ui_spectrometerGUI(object):
     def setupUi(self, spectrometerGUI,spectrometer):
@@ -191,7 +192,12 @@ class Ui_spectrometerGUI(object):
         self.label_8.setText(_translate("spectrometerGUI", "Number"))
         
     def startScanFunc(self):
-        self.spectrometer.startScan()
+        #create object to hold signal to report it is done
+        sds = scanDoneSignal()
+        #connect the signal to startScanFunc to start another scan if multiscan
+        sds.connectTrigger(self.startScanFunc)
+        #trigger the scan starting
+        self.spectrometer.startScan(sds)
         print('Started scan.')
         
     def startTimeScanFunc(self):
@@ -204,7 +210,7 @@ class Ui_spectrometerGUI(object):
         
     def startMultiScan(self):
         self.spectrometer.startMultiScan()
-        print('Start multiscan.')
+        print('Started multiscan.')
         
     def cancelMultiScan(self):
         self.spectrometer.cancelMultiScan()
@@ -231,8 +237,13 @@ class Ui_spectrometerGUI(object):
     def setMonochromatorPositionFunc(self):
         self.spectrometer.monochromatorGoTo(float(self.setMonochromatorPlainTextEdit.toPlainText()))
         
-
-
+#object to hold signal that reports on when a scan has completed and 
+#triggers another scan for multiscan
+class scanDoneSignal(QObject):
+    trigger = pyqtSignal()
+    
+    def connectTrigger(self,startscanfunc):
+        self.trigger.connect(startscanfunc)
 
 if __name__ == "__main__":
     import sys

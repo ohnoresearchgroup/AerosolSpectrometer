@@ -14,15 +14,15 @@ from spectrometer.timescan import TimeScan
 import threading
 import math
 
+
 class Spectrometer():
        
     def __init__(self):
-        
-        self.allscans = {}
-        self.alltimescans = {}
-        
         self.stopFlag = False
-        self.cancelMultiScanFlag = False
+        
+        self.multiScanFlag = False
+        self.multiScanIndex = 1
+        self.multiScanNumber = 1
         
             
     def assignWindow(self,window):
@@ -40,24 +40,25 @@ class Spectrometer():
     def initLaserArd(self):
         self.l = Laser('COM4')
         
-    def startScan(self):
-        #for starting one single scan, spins out a new thread and returns
+    def startScan(self,sds):
+        #object that holds signal for when scan is done
+        self.sds = sds
+        #sets flag for stopping scan in middle to false
         self.stopFlag = False
+        #initializes scan
         self.currentscan = Scan(self.window.getScanMin(),
                                 self.window.getScanMax(),
                                 self.window.getScanStep(),
                                 int(self.window.getScanDuration()),
-                                self)        
-        self.allscans[self.currentscan.time] = self.currentscan
+                                self,self.sds)        
         
-        #open new thread to handle scan
+        #spins out thread to run scan
         thread = threading.Thread(target=self.currentscan.startScan)
         thread.start()
        
     def startTimeScan(self):
         self.stopFlag = False
         self.currentscan = TimeScan(self)
-        self.alltimescans[self.currentscan.time] = self.currentscan
         
         #open new thread to handle scan
         thread = threading.Thread(target=self.currentscan.startScan)
@@ -72,49 +73,21 @@ class Spectrometer():
         
     def stopScan(self):
         self.stopFlag = True
-        
-        
+                
     def startMultiScan(self):
-        #open new thread to handle multi scans?????
-        ####threadMulti = threading.Thread(target=self.runMultiScan)
-        ####threadMulti.start()
-        self.runMultiScan()
-        
-    def startIndScan(self):
-        #for starting each individual scan in multiscan, returns when scan done
-        self.stopFlag = False
-        self.currentscan = Scan(self.window.getScanMin(),
-                                self.window.getScanMax(),
-                                self.window.getScanStep(),
-                                int(self.window.getScanDuration()),
-                                self)        
-        self.allscans[self.currentscan.time] = self.currentscan
-        self.currentscan.startScan()
-        
-        
-    def runMultiScan(self):
-        self.cancelMultiScanFlag == False
-        #get number of scans to run
+        self.multiScanFlag = True
+        self.multiScanIndex = 1
+        #get either number of scans or set it to infinite from GUI
         num = self.window.getMultiScanNumber()
         if num == 'Inf':
             num = math.inf
         else:
             num = int(num)
+        self.multiScanNumber = num
         
-        #while loop for each scan
-        index = 0    
-        while index < num:
-            self.startIndScan()
-            print('started scan' + str(index))
-            index = index + 1
-            #check if cancel scan flag has been set
-            if self.cancelMultiScanFlag == True:
-                break
-               
+        #calls function to start first scan, will trigger more scans at the end
+        #of each individual scan
+        self.window.startScanFunc()
+           
     def cancelMultiScan(self):
-        self.cancelMultiScanFlag = True
-     
-    def close(self):
-        self.pc.close()
-        self.m.close()
-        self.l.close()
+        self.multiScanFlag = False
