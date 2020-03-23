@@ -59,6 +59,7 @@ class Ui_RHcontrolGUI(object):
         self.setPointEdit = QtWidgets.QPlainTextEdit(self.centralwidget)
         self.setPointEdit.setGeometry(QtCore.QRect(180, 150, 101, 41))
         self.setPointEdit.setObjectName("setPointEdit")
+        self.setPointEdit.insertPlainText('30')
  
         #labels
         self.label = QtWidgets.QLabel(self.centralwidget)
@@ -82,6 +83,7 @@ class Ui_RHcontrolGUI(object):
         self.startPushButton.clicked.connect(self.startFunc)
         self.stopPushButton.clicked.connect(self.stopFunc)
         self.connectMFCpushButton.clicked.connect(self.rhcontrol.initMFCs)
+        self.setPointcheckBox.stateChanged.connect(self.spCheckBoxFunc)
         
         #central widget
         RHcontrolGUI.setCentralWidget(self.centralwidget)
@@ -123,6 +125,15 @@ class Ui_RHcontrolGUI(object):
         
     def getInterval(self):
         return float(self.intervalEdit.toPlainText())
+    
+    def getSetpoint(self):
+        return float(self.setPointEdit.toPlainText())
+    
+    def spCheckBoxFunc(self):
+        if self.setPointcheckBox.isChecked():
+            self.rhcontrol.startPID()
+        else:
+            self.rhcontrol.stopPID()
 
 if __name__ == "__main__":
     import sys

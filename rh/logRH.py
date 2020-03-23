@@ -81,3 +81,12 @@ class LogRH():
         #update the GUI
         self.rhcontrol.updateWindow(rh)
         
+        #if PID control is enabled
+        if self.rhcontrol.pidFlag:
+            #calculate process value
+            control = self.rhcontrol.pid(rh)
+            #run it
+            self.rhcontrol.setRatio(control)
+            
+        
+        
