@@ -56,16 +56,17 @@ class LogRH():
         self.timer.cancel()
                 
     def getRHdata(self):
-        #get new data and append
-        time = datetime.now().strftime('%Y_%m%d_%H:%M:%S')
-        rh = self.rhcontrol.getRH()   
-        
-        self.times.append(time)
+        #get new data
+        currtime = datetime.now()
+        rh = self.rhcontrol.getRH()
+     
+        #append new data
+        self.times.append(currtime)
         self.rhs.append(rh)
         
         #write to file
         self.file = open(self.fullpath + '/' + self.time + '.txt','a')
-        self.file.write(time + '\t' + str(rh) + '\n')
+        self.file.write(currtime.strftime('%Y-%m-%dT%H:%M:%S') + '\t' + str(rh) + '\n')
         self.file.close()
         
         #clear the previous lines, replot the updated line
