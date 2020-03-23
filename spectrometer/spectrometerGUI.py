@@ -149,6 +149,7 @@ class Ui_spectrometerGUI(object):
         self.setMonochromatorPushButton.clicked.connect(self.setMonochromatorPositionFunc)
         self.startMultiScanPushButton.clicked.connect(self.startMultiScan)
         self.cancelMultiScanPushButton.clicked.connect(self.cancelMultiScan)
+        self.laserCheckBox.stateChanged.connect(self.laserCheckboxFunc)
         
         #main
         spectrometerGUI.setCentralWidget(self.centralwidget)
@@ -216,6 +217,12 @@ class Ui_spectrometerGUI(object):
         self.spectrometer.cancelMultiScan()
         print('Canceled multiscan.')
         
+    def laserCheckboxFunc(self):
+        if self.laserCheckBox.isChecked():
+            self.spectrometer.turnLaserOn()
+        else:
+            self.spectrometer.turnLaserOff()
+          
     def getScanMin(self):
         return float(self.scanMinPlainTextEdit.toPlainText())
     

@@ -40,6 +40,12 @@ class Spectrometer():
     def initLaserArd(self):
         self.l = Laser('COM4')
         
+    def turnLaserOn(self):
+        self.l.turnOn()
+        
+    def turnLaserOff(self):
+        self.l.turnOff()
+        
     def startScan(self,sds):
         #object that holds signal for when scan is done
         self.sds = sds

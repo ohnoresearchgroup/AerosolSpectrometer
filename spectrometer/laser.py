@@ -44,7 +44,7 @@ class Laser():
         self.turnOFF()
         
         
-    def turnON(self):
+    def turnOn(self):
         #flush buffers
         self.ser.reset_input_buffer()
         self.ser.reset_output_buffer()
@@ -56,7 +56,7 @@ class Laser():
         else:
             print('Laser may not have turned on.')
         
-    def turnOFF(self):
+    def turnOff(self):
         #flush buffers
         self.ser.reset_input_buffer()
         self.ser.reset_output_buffer()
