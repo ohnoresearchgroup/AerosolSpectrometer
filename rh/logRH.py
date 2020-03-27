@@ -20,9 +20,9 @@ class LogRH():
         self.timer = RepeatTimer(interval, self.getRHdata)  
         
         #make path for day in RH folder if needed
-        self.rootdatapath = '/Users/pohno/Desktop/python/rh/2020'
+        self.rootdatapath = 'C:\\Users\\ESL328\\Google Drive\\Data\\RH\\2020'
         self.day = datetime.now().strftime('%Y%m%d')
-        self.fullpath = self.rootdatapath + '/' + self.day    
+        self.fullpath = self.rootdatapath + '\\' + self.day    
         if not os.path.exists(self.fullpath):
             os.makedirs(self.fullpath)
             
@@ -30,7 +30,7 @@ class LogRH():
         self.time = datetime.now().strftime('%Y%m%d_%H%M%S')
         
         #file name after time started
-        self.file = open(self.fullpath + '/' + self.time + '.txt','w+')
+        self.file = open(self.fullpath + '\\' + self.time + '.txt','w+')
         self.file.write('starttime\t' + self.time + '\n')
         self.file.write('interval\t' + str(self.interval) + ' s\n')
         self.file.write('\n')
@@ -65,7 +65,7 @@ class LogRH():
         self.rhs.append(rh)
         
         #write to file
-        self.file = open(self.fullpath + '/' + self.time + '.txt','a')
+        self.file = open(self.fullpath + '\\' + self.time + '.txt','a')
         self.file.write(currtime.strftime('%Y-%m-%dT%H:%M:%S') + '\t' + str(rh) + '\n')
         self.file.close()
         

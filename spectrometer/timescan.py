@@ -21,9 +21,9 @@ class TimeScan():
         self.time = datetime.now().strftime('%Y%m%d_%H%M%S')
         
         #make path for day in spectra folder if needed        
-        self.rootdatapath = '/Users/pohno/Desktop/python/spectra/2020'
+        self.rootdatapath = 'C:\\Users\\ESL328\\Google Drive\\Data\\Spectra\\2020'
         self.day = datetime.now().strftime('%Y%m%d')
-        self.fullpath = self.rootdatapath + '/' + self.day        
+        self.fullpath = self.rootdatapath + '\\' + self.day        
         if not os.path.exists(self.fullpath):
             os.mkdir(self.fullpath)
          
@@ -32,7 +32,7 @@ class TimeScan():
         self.position = 400
         
         #create file
-        self.file = open(self.fullpath + '/' + self.time + '_timescan.txt','w+')
+        self.file = open(self.fullpath + '\\' + self.time + '_timescan.txt','w+')
         self.file.write('time\t' + self.time + '\n')
         self.file.write('position\t' + str(self.position) + '\n')
         self.file.write('\n')
@@ -66,7 +66,7 @@ class TimeScan():
             self.counts.append(result)
                    
             #write to file
-            self.file = open(self.fullpath + '/' + self.time + '_timescan.txt','a')
+            self.file = open(self.fullpath + '\\' + self.time + '_timescan.txt','a')
             self.file.write(str(self.timeIndex) + '\t' + str(result) + '\n')
             self.file.close()
         
