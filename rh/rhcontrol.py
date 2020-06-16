@@ -8,8 +8,9 @@ Created on Mon Feb 10 16:22:44 2020
 from rh.mfc import MFC
 from rh.omegaTRH import OmegaTRH
 from rh.logRH import LogRH
-from rh.rhpid import RHpid
 import threading
+from simple_pid import PID
+from time import sleep
 
 class RHcontrol():
        
@@ -57,13 +58,25 @@ class RHcontrol():
         
         
     def startPID(self):
-        self.Kp = 1
-        self.Ki = 0.1
-        self.Kd = 0.05
+        self.Kp = 0.14
+        self.Ki = 0.0015
+        self.Kd = 0
         self.setpoint = self.getWindowSetpoint()
-        self.pid = RHpid(self.Kp,self.Ki,self.Kd,self.setpoint)
+        self.pid = PID(self.Kp,self.Ki,self.Kd,self.setpoint)
+        #lower limit wet flow ratio of 0.02
+        self.pid.output_limits = (0.02,1)
         
         self.pidFlag = True
+        
+        #open new thread to run PID control
+        thread = threading.Thread(target=self.runPID)
+        thread.start()
+        
+    def runPID(self):
+        while self.pidFlag:
+            self.setRatio(self.pid(self.getRH()))
+            sleep(2)
+
         
     def stopPID(self):
         self.pidFlag = False
