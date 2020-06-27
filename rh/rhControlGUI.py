@@ -38,7 +38,7 @@ class Ui_RHcontrolGUI(object):
         self.intervalEdit = QtWidgets.QPlainTextEdit(self.centralwidget)
         self.intervalEdit.setGeometry(QtCore.QRect(380, 100, 81, 21))
         self.intervalEdit.setObjectName("intervalEdit")
-        self.intervalEdit.insertPlainText('1')
+        self.intervalEdit.insertPlainText('5')
         
         #rh display
         self.rhDisplay = QtWidgets.QLCDNumber(self.centralwidget)
@@ -79,10 +79,11 @@ class Ui_RHcontrolGUI(object):
         self.label_4.setObjectName("label_4")
         
         ############signals and slots######
-        self.connectSensorPushButton.clicked.connect(self.rhcontrol.initSensor)
+        self.connectSensorPushButton.clicked.connect(self.initSensors)
+        self.connectMFCpushButton.clicked.connect(self.initMFCs)
         self.startPushButton.clicked.connect(self.startFunc)
         self.stopPushButton.clicked.connect(self.stopFunc)
-        self.connectMFCpushButton.clicked.connect(self.rhcontrol.initMFCs)
+        self.setPointEdit.textChanged.connect(self.setPIDsp)
         self.setPointcheckBox.stateChanged.connect(self.spCheckBoxFunc)
         
         #central widget
@@ -112,6 +113,12 @@ class Ui_RHcontrolGUI(object):
         self.connectSensorPushButton.setText(_translate("RHcontrolGUI", "Connect Sensor"))
         self.connectMFCpushButton.setText(_translate("RHcontrolGUI", "Connect MFCs"))
 
+    def initSensors(self):
+        self.rhcontrol.initSensors()
+    
+    def initMFCs(self):
+        self.rhcontrol.initMFCs()
+        
     def startFunc(self):
         self.rhcontrol.startLog()
         print('Started log.')
@@ -128,6 +135,9 @@ class Ui_RHcontrolGUI(object):
     
     def getSetpoint(self):
         return float(self.setPointEdit.toPlainText())
+    
+    def setPIDsp(self):
+        self.rhcontrol.setPIDsp(self.getSetpoint())
     
     def spCheckBoxFunc(self):
         if self.setPointcheckBox.isChecked():

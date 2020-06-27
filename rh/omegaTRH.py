@@ -9,6 +9,7 @@ Serial communications with Omega USB-RH
 
 
 import serial
+import numpy as np
 
 class OmegaTRH():
        
@@ -37,28 +38,40 @@ class OmegaTRH():
 
     #get T data
     def getT(self):
-        #flush buffers
-        self.ser.reset_input_buffer()
-        self.ser.reset_output_buffer()
-        
-        #send command to get data
-        self.ser.write(b'C\r\n')
+        t = np.nan
+        while np.isnan(t):
+            #flush buffers
+            self.ser.reset_input_buffer()
+            self.ser.reset_output_buffer()
+            
+            #send command to get data
+            self.ser.write(b'C\r\n')
     
         
-        result = self.ser.read(50).decode()
-        t = float(result.split(' ')[0])
+            result = self.ser.read(50).decode()
+            try:
+                t = float(result.split(' ')[0])
+            except ValueError:
+                t = np.nan
+                
         return t
     
     #get RH data    
-    def getRH(self):  
-        #flush buffers
-        self.ser.reset_input_buffer()
-        self.ser.reset_output_buffer()
-        
-        #send command to get data
-        self.ser.write(b'H\r\n')
-        
-        result = self.ser.read(50).decode()
-        rh = float(result.split(' ')[0])
+    def getRH(self):
+        rh = np.nan
+        while np.isnan(rh):
+            #flush buffers
+            self.ser.reset_input_buffer()
+            self.ser.reset_output_buffer()
+            
+            #send command to get data
+            self.ser.write(b'H\r\n')
+            
+            result = self.ser.read(50).decode()
+            try:
+                rh = float(result.split(' ')[0])
+            except ValueError:
+                rh = np.nan
+
         return rh
         

@@ -16,8 +16,10 @@ class RHcontrol():
        
     def __init__(self):      
         #set total flow rate
-        self.totalFlow = 10
+        self.totalFlow = 5
         
+        #initialize PID control with Ki,Kp,Kd
+        self.initPID()
         self.pidFlag = False
         
     def assignWindow(self,window):
@@ -31,14 +33,21 @@ class RHcontrol():
         self.wetMFC = MFC('COM8',20)
         print('MFCs initialized.')
    
-    def initSensor(self):
+    def initSensors(self):
         #RH sensor
-        self.RHsensor = OmegaTRH('COM6')
-        print('Sensor initialized.')
+        RHsensor1 = OmegaTRH('COM6')
+        RHsensor2 = OmegaTRH('COM10')
+        RHsensor3 = OmegaTRH('COM11')
+        self.RHsensors = [RHsensor1,RHsensor2,RHsensor3]
+        print('Sensors initialized.')
         
-    def getRH(self):
-        rh = self.RHsensor.getRH()
+    def getRH(self,sensorNum):
+        rh = self.RHsensors[sensorNum-1].getRH()
         return rh
+    
+    def getT(self,sensorNum):
+        t = self.RHsensors[sensorNum-1].getT()
+        return t
         
     def updateWindow(self,rh):
         self.window.updateLCD(rh)
@@ -56,27 +65,24 @@ class RHcontrol():
     def stopLog(self):
         self.log.stop()
         
-        
-    def startPID(self):
-        self.Kp = 0.14
-        self.Ki = 0.0015
-        self.Kd = 0
-        self.setpoint = self.getWindowSetpoint()
+    def initPID(self):
+        #function to call everytime you set new setpoint
+        #kp @ 0.3 gives oscillations with 150 second period
+        #before 6/27/2020 used 0.18, 0.0024, 6.75
+        #6/27/2020 set at 0.09,0.0012,3
+        self.Kp = 0.09
+        self.Ki = 0.0012
+        self.Kd = 3
+        self.setpoint = 30
         self.pid = PID(self.Kp,self.Ki,self.Kd,self.setpoint)
         #lower limit wet flow ratio of 0.02
         self.pid.output_limits = (0.02,1)
         
+    def setPIDsp(self,sp):
+        self.pid.setpoint = sp
+              
+    def startPID(self): 
         self.pidFlag = True
-        
-        #open new thread to run PID control
-        thread = threading.Thread(target=self.runPID)
-        thread.start()
-        
-    def runPID(self):
-        while self.pidFlag:
-            self.setRatio(self.pid(self.getRH()))
-            sleep(2)
-
         
     def stopPID(self):
         self.pidFlag = False
@@ -84,13 +90,13 @@ class RHcontrol():
     def setRatio(self,ratio):
         wetFlow = ratio*self.totalFlow
         dryFlow = (1-ratio)*self.totalFlow
-        
-        print('Dry:',str(self.dryMFC.setSP(dryFlow)),'LPM')
-        print('Wet:',str(self.wetMFC.setSP(wetFlow)),'LPM')        
+
+        self.dryMFC.setSP(dryFlow)
+        self.wetMFC.setSP(wetFlow)    
         
     def setTotalFlowRate(self,flowRate):
         self.totalFlow = flowRate
-        print('TotalFlow = ',str(flowRate), 'LPM')
+        #print('TotalFlow = ',str(flowRate), 'LPM')
         
     def getTotalFlowRate(self):
         print('TotalFlow = ',str(self.totalFlow), 'LPM')

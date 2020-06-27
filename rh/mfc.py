@@ -10,6 +10,7 @@ MFC must be set to be controlled by RS232.
 """
 
 import serial
+import numpy as np
 
 class MFC():
        
@@ -58,14 +59,22 @@ class MFC():
         sp = int(setPoint/self.maxFlow*64000)
         cmd = 'A' + str(sp) + '\r\n'
         
-        #flush buffers
-        self.ser.reset_input_buffer()
-        self.ser.reset_output_buffer()
+        sp = np.nan
+        while np.isnan(sp):
+            #flush buffers
+            self.ser.reset_input_buffer()
+            self.ser.reset_output_buffer()
         
-        #send command to get data
-        self.ser.write(cmd.encode())
+            #send command to get data
+            self.ser.write(cmd.encode())
         
-        result = self.ser.read(50).decode()
-        sp = float(result.split(' ')[5])
+            result = self.ser.read(50).decode()
+            try:
+                sp = float(result.split(' ')[5])
+            except ValueError:
+                sp = np.nan
+            except IndexError:
+                sp = np.nan
+        
         return str(sp)
         

@@ -10,6 +10,7 @@ from datetime import datetime
 import os
 import matplotlib.pyplot as plt
 from lib.repeattimer import RepeatTimer
+import numpy as np
 
 class LogRH():    
     def __init__(self,interval,rhcontrol):
@@ -34,16 +35,21 @@ class LogRH():
         self.file.write('starttime\t' + self.time + '\n')
         self.file.write('interval\t' + str(self.interval) + ' s\n')
         self.file.write('\n')
-        self.file.write('time\tRH\n')
+        self.file.write('time\ts1_RH\ts1_T\ts2_RH\ts2_T\ts3_RH\ts3_T\n')
         self.file.close()
 
         self.times = []
-        self.rhs = []
+        
+        self.rhs = [[],[],[]]
+        self.ts = [[],[],[]]
+
 
         # Create figure for plotting
         self.fig = plt.figure()
         self.ax = self.fig.add_subplot(1, 1, 1)
-        self.ax.plot(self.times,self.rhs)
+        self.ax.plot(self.times,self.rhs[0])
+        self.ax.plot(self.times,self.rhs[1])
+        self.ax.plot(self.times,self.rhs[2])
         plt.show()
         plt.xlabel('Time')
         plt.ylabel('RH [%]')
@@ -58,20 +64,34 @@ class LogRH():
     def getRHdata(self):
         #get new data
         currtime = datetime.now()
-        rh = self.rhcontrol.getRH()
-     
+        
+        currRHs = np.zeros(3)
+        currTs = np.zeros(3)
+        for i in range(3):
+            currRHs[i] = self.rhcontrol.getRH(i+1)
+            currTs[i] = self.rhcontrol.getT(i+1)
+
         #append new data
         self.times.append(currtime)
-        self.rhs.append(rh)
+        
+        for i in range(3):
+            self.rhs[i].append(currRHs[i])
+            self.ts[i].append(currTs[i])
         
         #write to file
         self.file = open(self.fullpath + '\\' + self.time + '.txt','a')
-        self.file.write(currtime.strftime('%Y-%m-%dT%H:%M:%S') + '\t' + str(rh) + '\n')
+        
+        string = ('\t' + str(currRHs[0]) + '\t' + str(currTs[0]) + 
+                  '\t' + str(currRHs[1]) + '\t' + str(currTs[1]) +
+                  '\t' + str(currRHs[2]) + '\t' + str(currTs[2]))
+        self.file.write(currtime.strftime('%Y-%m-%dT%H:%M:%S') + string + '\n')
         self.file.close()
         
         #clear the previous lines, replot the updated line
         self.ax.clear()
-        self.ax.plot(self.times, self.rhs)
+        self.ax.plot(self.times, self.rhs[0])
+        self.ax.plot(self.times, self.rhs[1])
+        self.ax.plot(self.times, self.rhs[2])
         self.fig.canvas.draw()
         self.fig.canvas.flush_events()
         plt.xlabel('Time')
@@ -79,14 +99,17 @@ class LogRH():
         plt.title(self.time)
         
         #update the GUI
-        self.rhcontrol.updateWindow(rh)
+        self.rhcontrol.updateWindow(currRHs[1])
         
         #if PID control is enabled
         if self.rhcontrol.pidFlag:
+
             #calculate process value
-            control = self.rhcontrol.pid(rh)
-            #run it
-            self.rhcontrol.setRatio(control)
+            controlRatio= self.rhcontrol.pid(currRHs[1])
+
+            #set new process variable
+            self.rhcontrol.setRatio(controlRatio)
+            print('wet flow =',controlRatio)
             
         
         
