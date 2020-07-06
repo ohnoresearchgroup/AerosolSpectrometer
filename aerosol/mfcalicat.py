@@ -12,7 +12,7 @@ MFC must be set to be controlled by RS232.
 import serial
 import numpy as np
 
-class MFC():
+class MFCalicat():
        
     def __init__(self,port,maxFlow):      
         #initialize the serial port
@@ -40,19 +40,7 @@ class MFC():
         #save max flow rate
         self.maxFlow = maxFlow
 
-    #get data from MFC
-    def getData(self):
-        #flush buffers
-        self.ser.reset_input_buffer()
-        self.ser.reset_output_buffer()
-        
-        #send command to get data
-        self.ser.write(b'A\r\n')
-    
-        
-        result = self.ser.read(50).decode()
-        return result
-        
+
     #set set point on MFC.    
     def setSP(self,setPoint):
         #put set point in format for MFC

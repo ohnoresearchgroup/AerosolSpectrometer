@@ -7,8 +7,8 @@
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtWidgets
-from rh.rhcontrol import RHcontrol
-from rh.rhControlGUI import Ui_RHcontrolGUI
+from aerosol.rhcontrol import RHcontrol
+from aerosol.rhControlGUI import Ui_RHcontrolGUI
 from spectrometer.spectrometerGUI import Ui_spectrometerGUI
 from spectrometer.spectrometer import Spectrometer
 import matplotlib
@@ -32,7 +32,7 @@ class Ui_MainWindow(object):
         self.spectrometerPushButton.setGeometry(QtCore.QRect(50, 90, 181, 61))
         self.spectrometerPushButton.setObjectName("spectrometerPushButton")
         self.spectrometerPushButton.clicked.connect(self.openSpectrometer)
-        
+♥        
         #main window
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)

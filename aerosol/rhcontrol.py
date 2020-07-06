@@ -5,12 +5,12 @@ Created on Mon Feb 10 16:22:44 2020
 @author: ESL328
 """
 
-from rh.mfc import MFC
-from rh.omegaTRH import OmegaTRH
-from rh.logRH import LogRH
+from aerosol.mfcmks import MFCmks
+from aerosol.omegaTRH import OmegaTRH
+from aerosol.logRH import LogRH
+from aeroosl.ncddac import NCDDAC
 import threading
 from simple_pid import PID
-from time import sleep
 
 class RHcontrol():
        
@@ -22,6 +22,8 @@ class RHcontrol():
         self.initPID()
         self.pidFlag = False
         
+        self.ncddac = NCDDAC('COM13')
+        
     def assignWindow(self,window):
         #function to gives this object the window object for function calls
         self.window = window
@@ -29,8 +31,8 @@ class RHcontrol():
 
     def initMFCs(self):
         #initialize MFCs
-        self.dryMFC = MFC('COM7',10)
-        self.wetMFC = MFC('COM8',20)
+        self.dryMFC = MFCmks(self.ncddac,1,20)
+        self.wetMFC = MFCmks(self.ncddac,2,20)
         print('MFCs initialized.')
    
     def initSensors(self):
@@ -70,9 +72,10 @@ class RHcontrol():
         #kp @ 0.3 gives oscillations with 150 second period
         #before 6/27/2020 used 0.18, 0.0024, 6.75
         #6/27/2020 set at 0.09,0.0012,3
-        self.Kp = 0.09
-        self.Ki = 0.0012
-        self.Kd = 3
+        #6/30/2020 settings for humid air flow
+        self.Kp = 0.009
+        self.Ki = 0.00012
+        self.Kd = .3
         self.setpoint = 30
         self.pid = PID(self.Kp,self.Ki,self.Kd,self.setpoint)
         #lower limit wet flow ratio of 0.02
