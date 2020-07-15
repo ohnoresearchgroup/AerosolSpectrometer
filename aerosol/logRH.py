@@ -9,7 +9,7 @@ Created on Wed Mar 18 11:28:19 2020
 from datetime import datetime
 import os
 import matplotlib.pyplot as plt
-from lib.repeattimer import RepeatTimer
+from repeattimer import RepeatTimer
 import numpy as np
 
 class LogRH():    
@@ -103,13 +103,20 @@ class LogRH():
         
         #if PID control is enabled
         if self.rhcontrol.pidFlag:
+            sp = self.rhcontrol.HCpid.setpoint/100
 
             #calculate process value
-            controlRatio= self.rhcontrol.pid(currRHs[1])
-
+            HCcontrolFactor= self.rhcontrol.HCpid(currRHs[1])
+            SFcontrolFactor = self.rhcontrol.SFpid(currRHs[2])
+            
+            HCcontrolRatio = max(0.04,min(HCcontrolFactor,0.98))
+            SFcontrolRatio = max(0.04,min(SFcontrolFactor,0.98))
+            
             #set new process variable
-            self.rhcontrol.setRatio(controlRatio)
-            print('wet flow =',controlRatio)
+            self.rhcontrol.setHCRatio(HCcontrolRatio)
+            print('HC wet flow =',HCcontrolRatio)
+            self.rhcontrol.setSFRatio(SFcontrolRatio)
+            print('SF wet flow =',SFcontrolRatio)
             
         
         

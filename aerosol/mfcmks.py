@@ -15,5 +15,5 @@ class MFCmks():
         
     #set set point on MFC.    
     def setSP(self,setPoint):        
-        #send setpoint to control unit as ratio of max flow
+        #send setpoint
         self.control.setFlow(setPoint,self.ch)

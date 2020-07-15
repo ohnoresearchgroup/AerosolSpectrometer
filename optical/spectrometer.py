@@ -6,11 +6,11 @@ Created on Tue Sep 17 16:23:12 2019
 @author: pohno
 """
 
-from spectrometer.monochromator import Monochromator
-from spectrometer.photoncounter import PhotonCounter
-from spectrometer.laser import Laser
-from spectrometer.scan import Scan
-from spectrometer.timescan import TimeScan
+from optical.monochromator import Monochromator
+from optical.photoncounter import PhotonCounter
+from optical.laser import Laser
+from optical.scan import Scan
+from optical.timescan import TimeScan
 import threading
 import math
 

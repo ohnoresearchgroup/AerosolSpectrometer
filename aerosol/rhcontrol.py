@@ -5,10 +5,10 @@ Created on Mon Feb 10 16:22:44 2020
 @author: ESL328
 """
 
-from aerosol.mfcmks import MFCmks
-from aerosol.omegaTRH import OmegaTRH
-from aerosol.logRH import LogRH
-from aeroosl.ncddac import NCDDAC
+from mfcmks import MFCmks
+from omegaTRH import OmegaTRH
+from logRH import LogRH
+from ncddac import NCDDAC
 import threading
 from simple_pid import PID
 
@@ -16,10 +16,13 @@ class RHcontrol():
        
     def __init__(self):      
         #set total flow rate
-        self.totalFlow = 5
+        self.HCtotalFlow = 5
+        self.SFtotalFlow = 7
         
         #initialize PID control with Ki,Kp,Kd
-        self.initPID()
+        self.initHCPID()
+        self.initSFPID()
+        
         self.pidFlag = False
         
         self.ncddac = NCDDAC('COM13')
@@ -31,15 +34,18 @@ class RHcontrol():
 
     def initMFCs(self):
         #initialize MFCs
-        self.dryMFC = MFCmks(self.ncddac,1,20)
-        self.wetMFC = MFCmks(self.ncddac,2,20)
+        self.HCdryMFC = MFCmks(self.ncddac,1)
+        self.HCwetMFC = MFCmks(self.ncddac,2)
+        
+        self.SFdryMFC = MFCmks(self.ncddac,4)
+        self.SFwetMFC = MFCmks(self.ncddac,3)
         print('MFCs initialized.')
    
     def initSensors(self):
         #RH sensor
-        RHsensor1 = OmegaTRH('COM6')
-        RHsensor2 = OmegaTRH('COM10')
-        RHsensor3 = OmegaTRH('COM11')
+        RHsensor1 = OmegaTRH('COM6') #10, dry particles
+        RHsensor2 = OmegaTRH('COM10') #14 HC particles
+        RHsensor3 = OmegaTRH('COM11') #19 Sheath Flow (SF)
         self.RHsensors = [RHsensor1,RHsensor2,RHsensor3]
         print('Sensors initialized.')
         
@@ -67,22 +73,30 @@ class RHcontrol():
     def stopLog(self):
         self.log.stop()
         
-    def initPID(self):
-        #function to call everytime you set new setpoint
-        #kp @ 0.3 gives oscillations with 150 second period
-        #before 6/27/2020 used 0.18, 0.0024, 6.75
-        #6/27/2020 set at 0.09,0.0012,3
-        #6/30/2020 settings for humid air flow
-        self.Kp = 0.009
-        self.Ki = 0.00012
-        self.Kd = .3
+    def initSFPID(self):
+        #6/30/2020 settings for humid air flow kp = 0.02, ki = 0.0003, kd = 0.04
+        self.Kp = 0.02
+        self.Ki = 0.0003
+        self.Kd = 0.0004
         self.setpoint = 30
-        self.pid = PID(self.Kp,self.Ki,self.Kd,self.setpoint)
-        #lower limit wet flow ratio of 0.02
-        self.pid.output_limits = (0.02,1)
+        self.SFpid = PID(self.Kp,self.Ki,self.Kd,self.setpoint)
+        #lower limit wet flow ratio of 0.04
+        self.SFpid.output_limits = (-1,1)
+        
+    def initHCPID(self):
+        #kp @ 0.6, oscillations at 500 seconds
+        #kp = 0.36, ki = 0.00144, kd = 22.5
+        self.Kp = 0.6
+        self.Ki = 0
+        self.Kd = 0
+        self.setpoint = 30
+        self.HCpid = PID(self.Kp,self.Ki,self.Kd,self.setpoint)
+        #lower limit wet flow ratio of 0.04
+        self.HCpid.output_limits = (-1,1)
         
     def setPIDsp(self,sp):
-        self.pid.setpoint = sp
+        self.HCpid.setpoint = sp
+        self.SFpid.setpoint = sp
               
     def startPID(self): 
         self.pidFlag = True
@@ -90,20 +104,20 @@ class RHcontrol():
     def stopPID(self):
         self.pidFlag = False
         
-    def setRatio(self,ratio):
-        wetFlow = ratio*self.totalFlow
-        dryFlow = (1-ratio)*self.totalFlow
+    def setHCRatio(self,ratio):
+        wetFlow = round(ratio*self.HCtotalFlow,3)
+        dryFlow = round((1-ratio)*self.HCtotalFlow,3)
 
-        self.dryMFC.setSP(dryFlow)
-        self.wetMFC.setSP(wetFlow)    
+        self.HCdryMFC.setSP(dryFlow)
+        self.HCwetMFC.setSP(wetFlow)    
         
-    def setTotalFlowRate(self,flowRate):
-        self.totalFlow = flowRate
-        #print('TotalFlow = ',str(flowRate), 'LPM')
-        
-    def getTotalFlowRate(self):
-        print('TotalFlow = ',str(self.totalFlow), 'LPM')
-        
+    def setSFRatio(self,ratio):
+        wetFlow = round(ratio*self.SFtotalFlow,3)
+        dryFlow = round((1-ratio)*self.SFtotalFlow,3)
+
+        self.SFdryMFC.setSP(dryFlow)
+        self.SFwetMFC.setSP(wetFlow)  
+
         
         
     

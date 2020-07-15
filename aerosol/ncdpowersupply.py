@@ -21,7 +21,7 @@ import serial
 import struct
 import time
 
-class NCDDAC():
+class NCDpowerSupply():
     
     def __init__(self,port):
         #initialize serial port
@@ -45,29 +45,3 @@ class NCDDAC():
         
         #save serial port 
         self.ser = ser
-        
-    def setFlow(self,rate,ch):
-        cmd = 'aa 05 be 0c '
-        if ch == 1:
-            cmd = cmd + '31'
-        elif ch == 2:
-            cmd = cmd + '32'
-        elif ch == 3:
-            cmd = cmd + '34'
-        elif ch == 4:
-            cmd = cmd + '38'
-        else:
-            print('channel must be 1-4')
-            return
-        
-        w = bytearray.fromhex(cmd)
-        
-        num = int(rate/30*65535)
-        twoBytes = struct.pack('>H',num)
-        
-        w.extend(twoBytes)      
-        w.append(sum(w)&255)
-        self.ser.write(w)
-        time.sleep(0.01) #need to wait before sending another ser cmd too fast
-        
-        
