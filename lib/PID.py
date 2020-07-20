@@ -76,13 +76,20 @@ class PID:
         delta_error = error - self.last_error
 
         if (delta_time >= self.sample_time):
+            #calculate proportional term
             self.PTerm = self.Kp * error
+            
+            #zero integral term each time error changes sign
+            if ((error * self.last_error) < 0):
+                self.ITerm = 0
+            #calculate integral term
             self.ITerm += error * delta_time
-
-            if (self.ITerm < -self.windup_guard):
-                self.ITerm = -self.windup_guard
-            elif (self.ITerm > self.windup_guard):
-                self.ITerm = self.windup_guard
+            
+            ##integral windup guard if not zeroing each time
+            #if (self.ITerm < -self.windup_guard):
+            #    self.ITerm = -self.windup_guard
+            #elif (self.ITerm > self.windup_guard):
+            #    self.ITerm = self.windup_guard
 
             self.DTerm = 0.0
             if delta_time > 0:

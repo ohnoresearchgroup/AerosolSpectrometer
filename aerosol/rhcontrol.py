@@ -82,9 +82,6 @@ class RHcontrol():
         self.SFsetpoint = 30
         self.SFpid = PID(self.SFKp,self.SFKi,self.SFKd)
         self.SFpid.SetPoint = 30
-        #self.SFpid.setWindup(1)
-        #lower limit wet flow ratio of 0.04
-        self.SFpid.output_limits = (-1,1)
         
     def initHCPID(self):
         #kp @ 0.6, oscillations at 500 seconds
@@ -95,10 +92,7 @@ class RHcontrol():
         self.HCsetpoint = 30
         self.HCpid = PID(self.HCKp,self.HCKi,self.HCKd)
         self.HCpid.SetPoint = 30
-        #self.HCpid.setWindup(1)
-        #lower limit wet flow ratio of 0.04
-        self.HCpid.output_limits = (-1,1)
-        
+  
     def setPIDsp(self,sp):
         self.HCpid.SetPoint = sp
         self.SFpid.SetPoint = sp
