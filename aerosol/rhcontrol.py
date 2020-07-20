@@ -10,7 +10,7 @@ from omegaTRH import OmegaTRH
 from logRH import LogRH
 from ncddac import NCDDAC
 import threading
-from simple_pid import PID
+from PID import PID
 
 class RHcontrol():
        
@@ -74,29 +74,34 @@ class RHcontrol():
         self.log.stop()
         
     def initSFPID(self):
-        #6/30/2020 settings for humid air flow kp = 0.02, ki = 0.0003, kd = 0.04
-        self.Kp = 0.02
-        self.Ki = 0.0003
-        self.Kd = 0.0004
-        self.setpoint = 30
-        self.SFpid = PID(self.Kp,self.Ki,self.Kd,self.setpoint)
+        #7/15/2020 kp @0.1, oscillating with period 240 seconds
+        #kp = 0.045, ki = 0.0005, kd = 1.8. works well at high RH but oscillating at low
+        self.SFKp = 0.01
+        self.SFKi = 0.00012
+        self.SFKd = 0.45
+        self.SFsetpoint = 30
+        self.SFpid = PID(self.SFKp,self.SFKi,self.SFKd)
+        self.SFpid.SetPoint = 30
+        #self.SFpid.setWindup(1)
         #lower limit wet flow ratio of 0.04
         self.SFpid.output_limits = (-1,1)
         
     def initHCPID(self):
         #kp @ 0.6, oscillations at 500 seconds
         #kp = 0.36, ki = 0.00144, kd = 22.5
-        self.Kp = 0.6
-        self.Ki = 0
-        self.Kd = 0
-        self.setpoint = 30
-        self.HCpid = PID(self.Kp,self.Ki,self.Kd,self.setpoint)
+        self.HCKp = 0.18
+        self.HCKi = 0.0007
+        self.HCKd = 11
+        self.HCsetpoint = 30
+        self.HCpid = PID(self.HCKp,self.HCKi,self.HCKd)
+        self.HCpid.SetPoint = 30
+        #self.HCpid.setWindup(1)
         #lower limit wet flow ratio of 0.04
         self.HCpid.output_limits = (-1,1)
         
     def setPIDsp(self,sp):
-        self.HCpid.setpoint = sp
-        self.SFpid.setpoint = sp
+        self.HCpid.SetPoint = sp
+        self.SFpid.SetPoint = sp
               
     def startPID(self): 
         self.pidFlag = True

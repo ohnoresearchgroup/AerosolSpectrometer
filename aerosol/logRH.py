@@ -103,14 +103,21 @@ class LogRH():
         
         #if PID control is enabled
         if self.rhcontrol.pidFlag:
-            sp = self.rhcontrol.HCpid.setpoint/100
+            sp = self.rhcontrol.HCpid.SetPoint/100
 
-            #calculate process value
-            HCcontrolFactor= self.rhcontrol.HCpid(currRHs[1])
-            SFcontrolFactor = self.rhcontrol.SFpid(currRHs[2])
+            #calculate pid output
+            self.rhcontrol.HCpid.update(currRHs[1])
+            HCcontrolFactor = self.rhcontrol.HCpid.output
+            self.rhcontrol.SFpid.update(currRHs[2])
+            SFcontrolFactor = self.rhcontrol.SFpid.output
             
-            HCcontrolRatio = max(0.04,min(HCcontrolFactor,0.98))
-            SFcontrolRatio = max(0.04,min(SFcontrolFactor,0.98))
+            #make sure it is between -1 and 1 and add it to setpoint
+            HCcontrolRatio = sp + max(-1,min(HCcontrolFactor,1))
+            SFcontrolRatio = sp + max(-1,min(SFcontrolFactor,1))
+            
+            #make sure it is between 0.04 and 1 and set wet flow ratio
+            HCcontrolRatio = max(0.04,min(HCcontrolRatio,1))
+            SFcontrolRatio = max(0.04,min(SFcontrolRatio,1))
             
             #set new process variable
             self.rhcontrol.setHCRatio(HCcontrolRatio)
