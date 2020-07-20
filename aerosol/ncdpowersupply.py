@@ -5,12 +5,9 @@ Created on Sat Jul  4 12:43:23 2020
         #API header \xAA
         #API payloud byte count (write byte + # to write) = \x05
         #API write command \xBE
-        #address bit = \x0c
-        #ch A = \x31
-        #ch B = \x32
-        #ch C = \x34
-        #ch D = \x38
-        #two bytes sixteen bit ADC value
+        #address bit = \x60
+        #write DAC output = \x40
+        #two bytes sixteen bit DAC value
         #final byte = checksum
 
 
@@ -45,3 +42,18 @@ class NCDpowerSupply():
         
         #save serial port 
         self.ser = ser
+        
+    def setVoltage(self,volt):
+        cmd = 'aa 05 be 60 40'
+        
+        w = bytearray.fromhex(cmd)
+        
+        num = int(volt/10*65535)
+        twoBytes = struct.pack('>H',num)
+        
+        w.extend(twoBytes) 
+        #calculate checksum
+        w.append(sum(w)&255)
+        self.ser.write(w)
+        time.sleep(0.01) #need to wait before sending another ser cmd too fast
+        
