@@ -80,7 +80,7 @@ class PID:
             self.PTerm = self.Kp * error
             
             #zero integral term each time error changes sign
-            if ((error * self.last_error) < 0):
+            if (((error * self.last_error) < 0) or (error == 0)):
                 self.ITerm = 0
             #calculate integral term
             self.ITerm += error * delta_time
