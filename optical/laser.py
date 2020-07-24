@@ -41,7 +41,7 @@ class Laser():
         
         #make sure laser is connected and off
         self.check()
-        self.turnOFF()
+        self.turnOff()
         
         
     def turnOn(self):

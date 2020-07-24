@@ -78,7 +78,7 @@ class Scan():
                 break
             else:
                 #go to wavelength
-                ################self.m.goTo(wl)#############
+                self.m.goTo(wl)
                 #update spectrometer window
                 self.spectrometer.updateMonochromatorWindow(wl)         
                 #write wavelength to file
@@ -91,7 +91,7 @@ class Scan():
                     #get one data point
                     time.sleep(0.5)
                     result = 1
-                    ###########result = self.pc.getData()###############
+                    result = self.pc.getData()
                     # if its nan, execute until gets data point that is a number
                     while np.isnan(result):
                         result = self.pc.getData()

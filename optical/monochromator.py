@@ -40,6 +40,8 @@ class Monochromator():
         #default setting of units angstroms
         self.setUnits('angstroms')
         
+        self.position = 400
+        
         time.sleep(1)
         
         #check status
@@ -68,7 +70,10 @@ class Monochromator():
         reply = self.ser.read_until(b'\x18',None)
         statusByte = reply[0:1]
         if (int.from_bytes(statusByte,byteorder='big') >= 128):
-            print('Command not excepted.')
+            print('Command not accepted.') #if command failed
+        else:
+            #if command succeeded
+            self.position = position
 
             
     #executes a query for position, returns in nanometers

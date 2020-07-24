@@ -29,13 +29,11 @@ class Spectrometer():
         self.window = window
             
     def initMonochromator(self):
-        #########self.m = Monochromator('COM1')############
-        self.m = 'mono' #########delete########
-        #######self.monochromatorGoTo(400)#########
+        self.m = Monochromator('COM1')
+        self.monochromatorGoTo(400)
         
     def initPhotonCounter(self):
-        ######self.pc = PhotonCounter('COM5')#############
-        self.pc = 'pc' ##########delete###########
+        self.pc = PhotonCounter('COM5')
         
     def initLaserArd(self):
         self.l = Laser('COM4')
@@ -74,7 +72,7 @@ class Spectrometer():
         self.window.updateMonochromatorLCD(position)
         
     def monochromatorGoTo(self,position):
-        ##########self.m.goTo(position)################
+        self.m.goTo(position)
         self.updateMonochromatorWindow(position)
         
     def stopScan(self):

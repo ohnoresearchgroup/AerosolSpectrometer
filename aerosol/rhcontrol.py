@@ -2,6 +2,10 @@
 """
 Created on Mon Feb 10 16:22:44 2020
 
+RHcontrol object that holds RH sensors, two bubbler systems each with two 
+MFCs each, and PID feedback control objects that control the two bubbler systems
+
+
 @author: ESL328
 """
 
@@ -15,16 +19,18 @@ from PID import PID
 class RHcontrol():
        
     def __init__(self):      
-        #set total flow rate
+        #set total flow rate for each bubbler system
         self.HCtotalFlow = 5
         self.SFtotalFlow = 7
         
-        #initialize PID control with Ki,Kp,Kd
+        #initialize PID controls with default settings
         self.initHCPID()
         self.initSFPID()
         
+        #set active PID control off
         self.pidFlag = False
         
+        #initialize DAC controller for MKS MFCs
         self.ncddac = NCDDAC('COM13')
         
     def assignWindow(self,window):
@@ -33,7 +39,9 @@ class RHcontrol():
         
 
     def initMFCs(self):
-        #initialize MFCs
+        #initialize MFCs for each of the two bubbler systems
+        #HC is humidity control for nafion dryer for particles
+        #SF is sheath flow for SMPS
         self.HCdryMFC = MFCmks(self.ncddac,1)
         self.HCwetMFC = MFCmks(self.ncddac,2)
         
@@ -42,7 +50,7 @@ class RHcontrol():
         print('MFCs initialized.')
    
     def initSensors(self):
-        #RH sensor
+        #initialize the three RH sensors
         RHsensor1 = OmegaTRH('COM6') #10, dry particles
         RHsensor2 = OmegaTRH('COM10') #14 HC particles
         RHsensor3 = OmegaTRH('COM11') #19 Sheath Flow (SF)
@@ -50,20 +58,21 @@ class RHcontrol():
         print('Sensors initialized.')
         
     def getRH(self,sensorNum):
+        #function to get RH from sensor
         rh = self.RHsensors[sensorNum-1].getRH()
         return rh
     
     def getT(self,sensorNum):
+        #function to get T from sensor
         t = self.RHsensors[sensorNum-1].getT()
         return t
         
     def updateWindow(self,rh):
+        #update the window with the RH
         self.window.updateLCD(rh)
         
-    def getWindowSetpoint(self):
-        return self.window.getSetpoint()
-        
     def startLog(self):
+        #intialize a new log object that gets and save the data
         self.log = LogRH(self.window.getInterval(),self)
         
         #open new thread to handle log
@@ -71,32 +80,52 @@ class RHcontrol():
         thread.start()
         
     def stopLog(self):
+        #stop the log
         self.log.stop()
         
     def initSFPID(self):
-        #7/15/2020 kp @0.1, oscillating with period 240 seconds
-        #kp = 0.045, ki = 0.0005, kd = 1.8. works well at high RH but oscillating at low
-        self.SFKp = 0.01
-        self.SFKi = 0.00012
-        self.SFKd = 0.45
-        self.SFsetpoint = 30
+        #7/20/20
+        #kp - 0.01, ki = 0.00012, kd = 0.45 (no windup) matches at low, oscillates at high
+        #7/22/20 kp = 0.021, ki = 0.00014, kd = 0.78, windup +- 0.6 (-0.1 to 1.1)
+        self.SFKp = 0.021
+        self.SFKi = 0.00014
+        self.SFKd = .78
         self.SFpid = PID(self.SFKp,self.SFKi,self.SFKd)
-        self.SFpid.SetPoint = 30
+        self.SFpid.SetPoint = 75
         
     def initHCPID(self):
-        #kp @ 0.6, oscillations at 500 seconds
-        #kp = 0.36, ki = 0.00144, kd = 22.5
-        self.HCKp = 0.18
-        self.HCKi = 0.0007
-        self.HCKd = 11
-        self.HCsetpoint = 30
+        #7/20/20
+        #kp = 0.18, ki = 0.0007, kd = 11 (no windup), works at low, oscillates at high
+        #trying with no derivative because time constant is so slow and change is discrete
+        #kp = 0.13, ki = 0.00016, kd = 0 eventually stabilizes but takes long time 
+        #for oscillations to damp down at sp = 75
+        #kp = 0.13, ki = 0.00016, kd = 3 works sp 68, 75, oscillates at 80
+        #7/23/2020: trying p=0.13,i=0.00016,d=3 at sp<75, p=0.065,i=0.00008,d=1.5 sp>=75
+        #windup = =- 0.6 (-0.1 to 1.1)
+        self.HCKp = 0.065
+        self.HCKi = 0.00008
+        self.HCKd = 1.5
         self.HCpid = PID(self.HCKp,self.HCKi,self.HCKd)
-        self.HCpid.SetPoint = 30
+        self.HCpid.SetPoint = 75
   
     def setPIDsp(self,sp):
-        self.HCpid.SetPoint = sp
-        self.SFpid.SetPoint = sp
-              
+        #check to make sure sp is in range
+        if 0 <= sp <= 100:
+            self.SFpid.SetPoint = sp
+            self.HCpid.SetPoint = sp
+            #adjust PID settings for humidity control nafion dryer
+            if sp >= 70:
+                self.HCpid.Kp = 0.065
+                self.HCpid.Ki = 0.00008
+                self.HCpid.Kd = 1.5
+            elif sp < 70:
+                self.HCpid.Kp = 0.13
+                self.HCpid.Ki = 0.00016
+                self.HCpid.Kd = 3
+        else:
+            print('SP must be between 0 and 100')
+                
+
     def startPID(self): 
         self.pidFlag = True
         
@@ -104,19 +133,27 @@ class RHcontrol():
         self.pidFlag = False
         
     def setHCRatio(self,ratio):
-        wetFlow = round(ratio*self.HCtotalFlow,3)
-        dryFlow = round((1-ratio)*self.HCtotalFlow,3)
-
-        self.HCdryMFC.setSP(dryFlow)
-        self.HCwetMFC.setSP(wetFlow)    
+        #set wet ratio of HC, must be between 0.04 and 1
+        if 0.04 <= ratio <= 1:
+            #calculate wet flows and dry flows
+            wetFlow = round(ratio*self.HCtotalFlow,3)
+            dryFlow = round((1-ratio)*self.HCtotalFlow,3)
+            
+            #set wetflows and dry flows
+            self.HCdryMFC.setSP(dryFlow)
+            self.HCwetMFC.setSP(wetFlow)
+        else:
+            print('Ratio must be between 0.04 and 1')
         
     def setSFRatio(self,ratio):
-        wetFlow = round(ratio*self.SFtotalFlow,3)
-        dryFlow = round((1-ratio)*self.SFtotalFlow,3)
-
-        self.SFdryMFC.setSP(dryFlow)
-        self.SFwetMFC.setSP(wetFlow)  
-
-        
-        
-    
+        #set wet ratio of SF, must be between 0.04 and 1
+        if 0.04 <= ratio <= 1:
+            #calculate wet flows and dry flows
+            wetFlow = round(ratio*self.SFtotalFlow,3)
+            dryFlow = round((1-ratio)*self.SFtotalFlow,3)
+            
+            #set wet flows and dry flows
+            self.SFdryMFC.setSP(dryFlow)
+            self.SFwetMFC.setSP(wetFlow)
+        else:
+            print('Ratio must be between 0.04 and 1')

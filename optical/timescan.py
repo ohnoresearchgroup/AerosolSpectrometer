@@ -8,7 +8,6 @@ Created on Mon Sep 16 17:22:45 2019
 import matplotlib.pyplot as plt
 from datetime import datetime
 import os
-import time
 
 class TimeScan():
        
@@ -28,8 +27,7 @@ class TimeScan():
             os.mkdir(self.fullpath)
          
         #get monochromator position
-        ########self.position = self.spectrometer.m.queryPosition()#######
-        self.position = 400
+        self.position = self.spectrometer.m.position
         
         #create file
         self.file = open(self.fullpath + '\\' + self.time + '_timescan.txt','w+')
@@ -58,9 +56,7 @@ class TimeScan():
     def startScan(self):
         
         while self.spectrometer.stopFlag == False:
-            #######result = self.pc.getData()########
-            time.sleep(1)   ######delete
-            result = 1      ######delete
+            result = self.pc.getData()
             
             self.times.append(self.timeIndex)
             self.counts.append(result)
