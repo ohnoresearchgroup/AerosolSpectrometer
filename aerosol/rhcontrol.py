@@ -21,7 +21,8 @@ class RHcontrol():
     def __init__(self):      
         #set total flow rate for each bubbler system
         self.HCtotalFlow = 5
-        self.SFtotalFlow = 7
+        #sheath flow = 7 if using both, 3.5 if using 1
+        self.SFtotalFlow = 3.5
         
         #initialize PID controls with default settings
         self.initHCPID()
@@ -100,11 +101,12 @@ class RHcontrol():
         #kp = 0.13, ki = 0.00016, kd = 0 eventually stabilizes but takes long time 
         #for oscillations to damp down at sp = 75
         #kp = 0.13, ki = 0.00016, kd = 3 works sp 68, 75, oscillates at 80
-        #7/23/2020: trying p=0.13,i=0.00016,d=3 at sp<75, p=0.065,i=0.00008,d=1.5 sp>=75
+        #7/23/2020: p=0.13,i=0.00016,d=3 at sp<75, p=0.065,i=0.00008,d=1.5 sp>=75
         #windup = =- 0.6 (-0.1 to 1.1)
-        self.HCKp = 0.065
-        self.HCKi = 0.00008
-        self.HCKd = 1.5
+        #8/26/20, switching sensor to be after fluorescence cell/HEPA:
+        self.HCKp = 0.2
+        self.HCKi = 0.00010
+        self.HCKd = 10
         self.HCpid = PID(self.HCKp,self.HCKi,self.HCKd)
         self.HCpid.SetPoint = 75
   
@@ -114,14 +116,14 @@ class RHcontrol():
             self.SFpid.SetPoint = sp
             self.HCpid.SetPoint = sp
             #adjust PID settings for humidity control nafion dryer
-            if sp >= 70:
-                self.HCpid.Kp = 0.065
-                self.HCpid.Ki = 0.00008
-                self.HCpid.Kd = 1.5
-            elif sp < 70:
-                self.HCpid.Kp = 0.13
-                self.HCpid.Ki = 0.00016
-                self.HCpid.Kd = 3
+            #if sp >= 70:
+            #    self.HCpid.Kp = 0.065
+            #    self.HCpid.Ki = 0.00008
+            #    self.HCpid.Kd = 1.5
+            #elif sp < 70:
+            #    self.HCpid.Kp = 0.13
+            #    self.HCpid.Ki = 0.00016
+            #    self.HCpid.Kd = 3
         else:
             print('SP must be between 0 and 100')
                 
