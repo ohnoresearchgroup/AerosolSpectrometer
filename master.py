@@ -9,6 +9,8 @@
 from PyQt5 import QtCore, QtWidgets
 from rhcontrol import RHcontrol
 from rhControlGUI import Ui_RHcontrolGUI
+from aerosolcontrol import AerosolControl
+from aerosolControlGUI import Ui_aerosolControlGUI
 from optical.spectrometerGUI import Ui_spectrometerGUI
 from optical.spectrometer import Spectrometer
 import matplotlib
@@ -17,26 +19,32 @@ matplotlib.use('Qt5Agg')
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(291, 228)
+        MainWindow.resize(284, 293)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         
-        #rh control push button
+        #rh control pushbutton
         self.rhControlpushButton = QtWidgets.QPushButton(self.centralwidget)
         self.rhControlpushButton.setGeometry(QtCore.QRect(50, 20, 181, 61))
         self.rhControlpushButton.setObjectName("rhControlpushButton")
         self.rhControlpushButton.clicked.connect(self.openRHcontrol)
         
-        #spectrometer push button
+        #spectrometer control pushbutton
         self.spectrometerPushButton = QtWidgets.QPushButton(self.centralwidget)
         self.spectrometerPushButton.setGeometry(QtCore.QRect(50, 90, 181, 61))
         self.spectrometerPushButton.setObjectName("spectrometerPushButton")
         self.spectrometerPushButton.clicked.connect(self.openSpectrometer)
         
+        #aerosol pushbutton
+        self.AerosolpushButton = QtWidgets.QPushButton(self.centralwidget)
+        self.AerosolpushButton.setGeometry(QtCore.QRect(50, 160, 181, 61))
+        self.AerosolpushButton.setObjectName("AerosolpushButton")
+        self.AerosolpushButton.clicked.connect(self.openAerosol)
+        
         #main window
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 291, 22))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 284, 22))
         self.menubar.setObjectName("menubar")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
@@ -51,20 +59,31 @@ class Ui_MainWindow(object):
         MainWindow.setWindowTitle(_translate("MainWindow", "Master Control"))
         self.rhControlpushButton.setText(_translate("MainWindow", "RH Control"))
         self.spectrometerPushButton.setText(_translate("MainWindow", "Spectrometer Control"))
-
+        self.AerosolpushButton.setText(_translate("MainWindow", "Aerosol Control"))
+        
     def initRHcontrol(self):
+        #called in beginning to setup window
         self.rhcontrol = RHcontrol()
 
     def openRHcontrol(self):
-        #show the RH control window
+        #show RH control window when button pressed
         rhWindow.show()
         
     def initSpectrometer(self):
+        #called in beginning to setup window
         self.spectrometer = Spectrometer()
         
     def openSpectrometer(self):
+        #show spectrometer window when button pressed
         spectrometerWindow.show()
-
+        
+    def initAerosol(self):
+        #called in beginning to setup window
+        self.aerosol = AerosolControl()
+        
+    def openAerosol(self):
+        #show aerosol window when button pressed
+        aerosolWindow.show()
 
 
 if __name__ == "__main__":
@@ -85,7 +104,7 @@ if __name__ == "__main__":
     #give RH control object the window
     uiMain.rhcontrol.assignWindow(uiRH)
     
-    #creae window for spectrometer control (doesn't show it yet)
+    #create window for spectrometer control (doesn't show it yet)
     uiMain.initSpectrometer()
     spectrometerWindow = QtWidgets.QMainWindow()
     uiSpec = Ui_spectrometerGUI()
@@ -93,6 +112,13 @@ if __name__ == "__main__":
     uiSpec.setupUi(spectrometerWindow,uiMain.spectrometer)
     #give spectrometer object the window
     uiMain.spectrometer.assignWindow(uiSpec)
+    
+    #create window for aerosol control (doesn't show it yet)
+    uiMain.initAerosol()
+    aerosolWindow = QtWidgets.QMainWindow()
+    uiAer = Ui_aerosolControlGUI()
+    #give aerosol gui the aerosol object
+    uiAer.setupUi(aerosolWindow,uiMain.aerosol)
     
     #for exit
     sys.exit(app.exec_())
