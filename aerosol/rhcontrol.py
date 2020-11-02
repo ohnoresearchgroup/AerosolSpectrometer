@@ -88,9 +88,10 @@ class RHcontrol():
         #7/20/20
         #kp - 0.01, ki = 0.00012, kd = 0.45 (no windup) matches at low, oscillates at high
         #7/22/20 kp = 0.021, ki = 0.00014, kd = 0.78, windup +- 0.6 (-0.1 to 1.1)
-        self.SFKp = 0.021
-        self.SFKi = 0.00014
-        self.SFKd = .78
+        #9/15/20 has been oscillating, changing to kp = 0.01, ki = 0.00007, kd= 0
+        self.SFKp = 0.01
+        self.SFKi = 0.00007
+        self.SFKd = 0
         self.SFpid = PID(self.SFKp,self.SFKi,self.SFKd)
         self.SFpid.SetPoint = 75
         
@@ -107,6 +108,7 @@ class RHcontrol():
         #Kp = 0.2, Ki = 0.0001, Kd = 10 works well, but small changes after cell
         #lead to oscillations before cell as it corrects, probably best to focus PID 
         #after cell 
+        #9/29/20 PID oscillating above 80, added kp = 0.0325, ki = 0.00004, kd = 0.75
         self.HCKp = 0.065
         self.HCKi = 0.00008
         self.HCKd = 1.5
@@ -119,14 +121,18 @@ class RHcontrol():
             self.SFpid.SetPoint = sp
             self.HCpid.SetPoint = sp
             #adjust PID settings for humidity control nafion dryer
-            if sp >= 70:
+            if sp < 70:
+                self.HCpid.Kp = 0.13
+                self.HCpid.Ki = 0.00016
+                self.HCpid.Kd = 3         
+            elif 70 <= sp < 80:
                 self.HCpid.Kp = 0.065
                 self.HCpid.Ki = 0.00008
                 self.HCpid.Kd = 1.5
-            elif sp < 70:
-                self.HCpid.Kp = 0.13
-                self.HCpid.Ki = 0.00016
-                self.HCpid.Kd = 3
+            else:
+                self.HCpid.Kp = 0.0325
+                self.HCpid.Ki = 0.00004
+                self.HCpid.Kd = 0.75
         else:
             print('SP must be between 0 and 100')
                 

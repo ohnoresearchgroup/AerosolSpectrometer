@@ -17,7 +17,8 @@ class AerosolControl():
         
     def connectArd(self):
         #initialize arduino to control
-        self.aerosolarduino = AerosolArduino('COMXX')
+        self.aerosolarduino = AerosolArduino('COM12')
+        print("Aerosol arduino connected.")
         
     def turnOnAtomizer(self):
         self.aerosolarduino.turnOnAtomizer()

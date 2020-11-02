@@ -42,7 +42,7 @@ class Ui_aerosolControlGUI(object):
         ###signal and slots###
         self.atomizerCheck.clicked.connect(self.atomizerCheckFunc)
         self.cellParticlesCheck.clicked.connect(self.cellParticlesCheckFunc)
-        self.syingePumpCheck.clicked.connect(self.syringePumpCheckFunc)
+        self.syringePumpCheck.clicked.connect(self.syringePumpCheckFunc)
         self.connectArdpushButton.clicked.connect(self.connectArdFunc)
         
         
@@ -77,7 +77,7 @@ class Ui_aerosolControlGUI(object):
         if self.cellParticlesCheck.isChecked():
             self.aerosolcontrol.turnOnCellParticles()
         else:
-            self.aerosolcontrol.turnOnCellParticles()
+            self.aerosolcontrol.turnOffCellParticles()
             
     def syringePumpCheckFunc(self):
         if self.syringePumpCheck.isChecked():
