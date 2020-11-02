@@ -118,8 +118,16 @@ class RHcontrol():
     def setPIDsp(self,sp):
         #check to make sure sp is in range
         if 0 <= sp <= 100:
-            self.SFpid.SetPoint = sp
+            #set sheath flow setpoint to 80 if above 80%
+            #to avoid condensation in CPC
+            if sp > 80:
+                self.SFpid.SetPoint = 80
+            else:
+                self.SFpid.SetPoint = sp
+             
+            #set humidity control setpoint to value
             self.HCpid.SetPoint = sp
+            
             #adjust PID settings for humidity control nafion dryer
             if sp < 70:
                 self.HCpid.Kp = 0.13
