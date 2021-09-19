@@ -11,6 +11,7 @@ MFCs each, and PID feedback control objects that control the two bubbler systems
 
 from mfcmks import MFCmks
 from omegaTRH import OmegaTRH
+from rotronicTRH import RotronicTRH
 from logRH import LogRH
 from ncddac import NCDDAC
 import threading
@@ -22,7 +23,7 @@ class RHcontrol():
         #set total flow rate for each bubbler system
         self.HCtotalFlow = 5
         #sheath flow = 7 if using both, 3.5 if using 1
-        self.SFtotalFlow = 3.5
+        self.SFtotalFlow = 6
         
         #initialize PID controls with default settings
         self.initHCPID()
@@ -43,18 +44,20 @@ class RHcontrol():
         #initialize MFCs for each of the two bubbler systems
         #HC is humidity control for nafion dryer for particles
         #SF is sheath flow for SMPS
-        self.HCdryMFC = MFCmks(self.ncddac,1)
-        self.HCwetMFC = MFCmks(self.ncddac,2)
+        self.HCdryMFC = MFCmks(self.ncddac,4)
+        self.HCwetMFC = MFCmks(self.ncddac,3)
         
-        self.SFdryMFC = MFCmks(self.ncddac,4)
-        self.SFwetMFC = MFCmks(self.ncddac,3)
+        self.SFdryMFC = MFCmks(self.ncddac,1)
+        self.SFwetMFC = MFCmks(self.ncddac,2)
         print('MFCs initialized.')
    
     def initSensors(self):
         #initialize the three RH sensors
         RHsensor1 = OmegaTRH('COM6') #10, dry particles
-        RHsensor2 = OmegaTRH('COM10') #14 HC particles
-        RHsensor3 = OmegaTRH('COM11') #19 Sheath Flow (SF)
+        RHsensor2 = RotronicTRH('COM7') #HC particles
+        #RHsensor2 = OmegaTRH('COM10') #14 HC particles
+        RHsensor3 = RotronicTRH('COM8') #Sheath flow
+        #RHsensor3 = OmegaTRH('COM11') #19 Sheath Flow (SF)
         self.RHsensors = [RHsensor1,RHsensor2,RHsensor3]
         print('Sensors initialized.')
         
@@ -120,8 +123,9 @@ class RHcontrol():
         if 0 <= sp <= 100:
             #set sheath flow setpoint to 80 if above 80%
             #to avoid condensation in CPC
-            if sp > 80:
-                self.SFpid.SetPoint = 80
+            limit = 82.5
+            if sp > limit:
+                self.SFpid.SetPoint = limit
             else:
                 self.SFpid.SetPoint = sp
              

@@ -38,7 +38,7 @@ class Scan():
         self.time = datetime.now().strftime('%Y%m%d_%H%M%S')
         
         #make path for day in spectra folder if needed        
-        self.rootdatapath = 'C:\\Users\\ESL328\\Google Drive\\Data\\Spectra\\2020'
+        self.rootdatapath = 'C:\\Users\\ESL328\\Google Drive\\Data\\Spectra\\2021'
         self.day = datetime.now().strftime('%Y%m%d')
         self.fullpath = self.rootdatapath + '\\' + self.day        
         if not os.path.exists(self.fullpath):
