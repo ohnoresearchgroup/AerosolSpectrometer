@@ -106,14 +106,14 @@ class LogRH():
         if self.rhcontrol.pidFlag:
 
             #calculate pid output
-            self.rhcontrol.HCpid.update(currRHs[1])
-            HCcontrolRatio = self.rhcontrol.HCpid.output + 0.5
-            self.rhcontrol.SFpid.update(currRHs[2])
-            SFcontrolRatio = self.rhcontrol.SFpid.output + 0.5
+            self.rhcontrol.HCpid.update(currRHs[1]/100)
+            HCcontrolRatio = self.rhcontrol.HCpid.output
+            self.rhcontrol.SFpid.update(currRHs[2]/100)
+            SFcontrolRatio = self.rhcontrol.SFpid.output
             
             #make sure it is between 0.04 and 1 and add it to setpoint
-            HCcontrolRatio = max(0.04,min(HCcontrolRatio,1))
-            SFcontrolRatio = max(0.04,min(SFcontrolRatio,1))
+            HCcontrolRatio = max(0.04,min(HCcontrolRatio,0.99))
+            SFcontrolRatio = max(0.04,min(SFcontrolRatio,0.99))
             
             #set new process variable
             self.rhcontrol.setHCRatio(HCcontrolRatio)

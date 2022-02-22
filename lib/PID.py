@@ -20,8 +20,8 @@ class PID:
         self.DTerm = 0.0
 
         # Windup Guard
-        self.windup_guardL = -0.6
-        self.windup_guardH = 0.6
+        self.windup_guardL = 0
+        self.windup_guardH = 1
 
         self.output = 0.0
 
@@ -56,7 +56,8 @@ class PID:
                 
         else:
             self.DTerm = 0
-            self.ITerm = 0
+            #sets ITerm to setpoint on first run
+            self.ITerm = self.SetPoint * 1.11
 
         # Remember last time and last error for next calculation
         self.last_time = self.current_time
