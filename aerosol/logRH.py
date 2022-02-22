@@ -21,7 +21,7 @@ class LogRH():
         self.timer = RepeatTimer(interval, self.getRHdata)  
         
         #make path for day in RH folder if needed
-        self.rootdatapath = 'C:\\Users\\ESL328\\Google Drive\\Data\\RH\\2021'
+        self.rootdatapath = 'C:\\Users\\ESL328\\Google Drive\\Data\\RH\\2022'
         self.day = datetime.now().strftime('%Y%m%d')
         self.fullpath = self.rootdatapath + '\\' + self.day    
         if not os.path.exists(self.fullpath):
