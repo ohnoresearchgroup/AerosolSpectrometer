@@ -6,7 +6,7 @@ Created on Mon Aug 31 14:48:26 2020
 @author: pohno
 """
 
-from aerosolarduino import AerosolArduino
+from aerosol.aerosolarduino import AerosolArduino
 
 class AerosolControl():
        

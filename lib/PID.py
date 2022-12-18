@@ -57,7 +57,7 @@ class PID:
         else:
             self.DTerm = 0
             #sets ITerm to setpoint on first run
-            self.ITerm = self.SetPoint * 1.11
+            self.ITerm = self.SetPoint
 
         # Remember last time and last error for next calculation
         self.last_time = self.current_time

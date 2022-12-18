@@ -80,7 +80,7 @@ class Ui_RHcontrolGUI(object):
         
         ############signals and slots######
         self.connectSensorPushButton.clicked.connect(self.initSensors)
-        self.connectMFCpushButton.clicked.connect(self.initMFCs)
+        self.connectMFCpushButton.clicked.connect(self.initValveControl)
         self.startPushButton.clicked.connect(self.startFunc)
         self.stopPushButton.clicked.connect(self.stopFunc)
         self.setPointEdit.textChanged.connect(self.setPIDsp)
@@ -111,13 +111,13 @@ class Ui_RHcontrolGUI(object):
         self.label_2.setText(_translate("RHcontrolGUI", "Log"))
         self.stopPushButton.setText(_translate("RHcontrolGUI", "Stop"))
         self.connectSensorPushButton.setText(_translate("RHcontrolGUI", "Connect Sensor"))
-        self.connectMFCpushButton.setText(_translate("RHcontrolGUI", "Connect MFCs"))
+        self.connectMFCpushButton.setText(_translate("RHcontrolGUI", "Connect Valves"))
 
     def initSensors(self):
         self.rhcontrol.initSensors()
     
-    def initMFCs(self):
-        self.rhcontrol.initMFCs()
+    def initValveControl(self):
+        self.rhcontrol.initValveControl()
         
     def startFunc(self):
         self.rhcontrol.startLog()

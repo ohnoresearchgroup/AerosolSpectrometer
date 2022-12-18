@@ -9,7 +9,7 @@ Created on Wed Mar 18 11:28:19 2020
 from datetime import datetime
 import os
 import matplotlib.pyplot as plt
-from repeattimer import RepeatTimer
+from lib.repeattimer import RepeatTimer
 import numpy as np
 
 class LogRH():    
@@ -21,9 +21,9 @@ class LogRH():
         self.timer = RepeatTimer(interval, self.getRHdata)  
         
         #make path for day in RH folder if needed
-        self.rootdatapath = 'C:\\Users\\ESL328\\Google Drive\\Data\\RH\\2022'
+        self.rootdatapath = 'C:\\Users\\csmpeo1\\OneDrive\\RHLogs\\2022'
         self.day = datetime.now().strftime('%Y%m%d')
-        self.fullpath = self.rootdatapath + '\\' + self.day    
+        self.fullpath = os.path.join(self.rootdatapath, self.day)    
         if not os.path.exists(self.fullpath):
             os.makedirs(self.fullpath)
             
@@ -67,9 +67,9 @@ class LogRH():
         
         currRHs = np.zeros(3)
         currTs = np.zeros(3)
-        for i in range(3):
-            currRHs[i] = self.rhcontrol.getRH(i+1)
-            currTs[i] = self.rhcontrol.getT(i+1)
+        for i in range(1):
+            currRHs[i] = self.rhcontrol.getRH(i)
+            currTs[i] = self.rhcontrol.getT(i)
 
         #append new data
         self.times.append(currtime)
@@ -100,26 +100,26 @@ class LogRH():
         plt.title(self.time)
         
         #update the GUI
-        self.rhcontrol.updateWindow(currRHs[1])
+        self.rhcontrol.updateWindow(currRHs[0])
         
         #if PID control is enabled
         if self.rhcontrol.pidFlag:
 
             #calculate pid output
-            self.rhcontrol.HCpid.update(currRHs[1]/100)
-            HCcontrolRatio = self.rhcontrol.HCpid.output
-            self.rhcontrol.SFpid.update(currRHs[2]/100)
-            SFcontrolRatio = self.rhcontrol.SFpid.output
+            self.rhcontrol.Flow1_pid.update(currRHs[0]/100)
+            Flow1_controlVoltage = 1-self.rhcontrol.Flow1_pid.output
+            self.rhcontrol.Flow2_pid.update(currRHs[1]/100)
+            Flow2_controlVoltage = 1-self.rhcontrol.Flow2_pid.output
             
-            #make sure it is between 0.04 and 1 and add it to setpoint
-            HCcontrolRatio = max(0.04,min(HCcontrolRatio,0.99))
-            SFcontrolRatio = max(0.04,min(SFcontrolRatio,0.99))
+            #make sure it is between 0 and 1 and add it to setpoint
+            Flow1_controlVoltage = max(0,min(Flow1_controlVoltage,1))
+            Flow2_controlVoltage = max(0,min(Flow2_controlVoltage,1))
             
             #set new process variable
-            self.rhcontrol.setHCRatio(HCcontrolRatio)
-            print('HC wet flow =',HCcontrolRatio)
-            self.rhcontrol.setSFRatio(SFcontrolRatio)
-            print('SF wet flow =',SFcontrolRatio)
+            self.rhcontrol.setFlow1_Voltage(Flow1_controlVoltage)
+            print('flow 1 voltage =',Flow1_controlVoltage, ' ',currRHs[0])
+            self.rhcontrol.setFlow2_Voltage(Flow2_controlVoltage)
+            print('flow 2 voltage =',Flow2_controlVoltage, ' ',currRHs[1])
             
         
         

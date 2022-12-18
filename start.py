@@ -7,10 +7,10 @@
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtWidgets
-from rhcontrol import RHcontrol
-from rhControlGUI import Ui_RHcontrolGUI
-from aerosolcontrol import AerosolControl
-from aerosolControlGUI import Ui_aerosolControlGUI
+from aerosol.rhcontrol import RHcontrol
+from aerosol.rhControlGUI import Ui_RHcontrolGUI
+from aerosol.aerosolcontrol import AerosolControl
+from aerosol.aerosolControlGUI import Ui_aerosolControlGUI
 from optical.spectrometerGUI import Ui_spectrometerGUI
 from optical.spectrometer import Spectrometer
 import matplotlib
