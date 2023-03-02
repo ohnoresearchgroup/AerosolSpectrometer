@@ -107,13 +107,13 @@ class LogRH():
 
             #calculate pid output
             self.rhcontrol.Flow1_pid.update(currRHs[0]/100)
-            Flow1_controlVoltage = 1-self.rhcontrol.Flow1_pid.output
+            Flow1_controlVoltage = 2-self.rhcontrol.Flow1_pid.output
             self.rhcontrol.Flow2_pid.update(currRHs[1]/100)
-            Flow2_controlVoltage = 1-self.rhcontrol.Flow2_pid.output
+            Flow2_controlVoltage = 2-self.rhcontrol.Flow2_pid.output
             
             #make sure it is between 0 and 1 and add it to setpoint
-            Flow1_controlVoltage = max(0,min(Flow1_controlVoltage,1))
-            Flow2_controlVoltage = max(0,min(Flow2_controlVoltage,1))
+            Flow1_controlVoltage = max(0,min(Flow1_controlVoltage,2))
+            Flow2_controlVoltage = max(0,min(Flow2_controlVoltage,2))
             
             #set new process variable
             self.rhcontrol.setFlow1_Voltage(Flow1_controlVoltage)

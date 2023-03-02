@@ -21,7 +21,7 @@ class PID:
 
         # Windup Guard
         self.windup_guardL = 0
-        self.windup_guardH = 1
+        self.windup_guardH = 2
 
         self.output = 0.0
 

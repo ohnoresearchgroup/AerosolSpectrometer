@@ -41,7 +41,7 @@ class RHcontrol():
    
     def initSensors(self):
         #initialize the three RH sensors
-        RHsensor1 = OmegaTRH('COM3') #10, dry particles
+        RHsensor1 = OmegaTRH('COM4') #10, dry particles
         #RHsensor2 = RotronicTRH('COM7') #HC particles
         #RHsensor2 = OmegaTRH('COM10') #14 HC particles
         #RHsensor3 = RotronicTRH('COM8') #Sheath flow
@@ -77,9 +77,12 @@ class RHcontrol():
         self.log.stop()
         
     def initFlow1_PID(self):
-        self.Flow1_Kp = 1
-        self.Flow1_Ki = 0.007
-        self.Flow1_Kd = 0
+        #self.Flow1_Kp = 1
+        #self.Flow1_Ki = 0.007
+        #self.Flow1_Kd = 0
+        self.Flow1_Kp = 1.125
+        self.Flow1_Ki = 0.0804
+        self.Flow1_Kd = 3.9375
         self.Flow1_pid = PID(self.Flow1_Kp,self.Flow1_Ki,self.Flow1_Kd)
         self.Flow1_pid.SetPoint = 0.75
         
@@ -136,18 +139,18 @@ class RHcontrol():
         
     def setFlow1_Voltage(self,voltage):
         #set voltage for Flow 1
-        if 0 <= voltage <= 1:
+        if 0 <= voltage <= 2:
 
             self.labjack.writeVoltage(1,voltage)
  
         else:
-            print('Ratio must be between 0 and 1')
+            print('Ratio must be between 0 and 5')
         
     def setFlow2_Voltage(self,voltage):
         #set voltage for Flow 1
-        if 0 <= voltage <= 1:
+        if 0 <= voltage <= 2:
 
             self.labjack.writeVoltage(2,voltage)
  
         else:
-            print('Ratio must be between 0 and 1')
+            print('Ratio must be between 0 and 5')
