@@ -77,19 +77,24 @@ class RHcontrol():
         self.log.stop()
         
     def initFlow1_PID(self):
-        #self.Flow1_Kp = 1
-        #self.Flow1_Ki = 0.007
-        #self.Flow1_Kd = 0
+
+        
+        #tuned at 75 %RH (good at 80, 70, 20, 30)
         self.Flow1_Kp = 1.125
         self.Flow1_Ki = 0.0804
         self.Flow1_Kd = 3.9375
+        
+        #tuned at 60% RH (good at 60, 50, 40, 30)
+        #self.Flow1_Kp = 0.5769
+        #self.Flow1_Ki = 0.0412
+        #self.Flow1_Kd = 2.01915
         self.Flow1_pid = PID(self.Flow1_Kp,self.Flow1_Ki,self.Flow1_Kd)
         self.Flow1_pid.SetPoint = 0.75
         
     def initFlow2_PID(self):
-        self.Flow2_Kp = 1.6
-        self.Flow2_Ki = 0.0018
-        self.Flow2_Kd = 37.5
+        self.Flow2_Kp = 0
+        self.Flow2_Ki = 0
+        self.Flow2_Kd = 0
         
         self.Flow2_pid = PID(self.Flow2_Kp,self.Flow2_Ki,self.Flow2_Kd)
         self.Flow2_pid.SetPoint = 0.75
@@ -107,25 +112,15 @@ class RHcontrol():
                 self.Flow1_pid.SetPoint = sp/100
                 self.Flow2_pid.SetPoint = sp/100
              
-            #reset PIDS (ITerm automatically sets to sp)
-            #self.HCpid.last_time = None
-            #self.SFpid.last_time = None
-
-            
-            #adjust PID settings for humidity control nafion dryer
-            #20211011 Rreduced integral by 10% to try and reduce oscillations
-            if sp < 70:
-                self.Flow2_pid.Kp = 13
-                self.Flow2_pid.Ki = 0.016
-                self.Flow2_pid.Kd = 300         
-            elif 70 <= sp < 75:
-                self.Flow2_pid.Kp = 6.5
-                self.Flow2_pid.Ki = 0.008
-                self.Flow2_pid.Kd = 150
+            if 35 < sp < 65:
+                self.Flow1_pid.Kp = 0.5769
+                self.Flow1_pid.Ki = 0.0412
+                self.Flow1_pid.Kd = 2.01915     
             else:
-                self.Flow2_pid.Kp = 1.6
-                self.Flow2_pid.Ki = 0.0018
-                self.Flow2_pid.Kd = 37.5
+                #divided by 2
+                self.Flow1_pid.Kp = 0.5625
+                self.Flow1_pid.Ki = 0.0402
+                self.Flow1_pid.Kd = 1.969
 
         else:
             print('SP must be between 0 and 100')
